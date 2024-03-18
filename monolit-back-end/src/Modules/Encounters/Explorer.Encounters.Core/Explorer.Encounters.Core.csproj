@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Runtime.Caching" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Stakeholders\Explorer.Stakeholders.API\Explorer.Stakeholders.API.csproj" />
+    <ProjectReference Include="..\Explorer.Encounters.API\Explorer.Encounters.API.csproj" />
+  </ItemGroup>
+
+</Project>
