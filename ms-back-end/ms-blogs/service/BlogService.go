@@ -1,0 +1,27 @@
+package service
+
+import (
+	"fmt"
+	"ms-blogs/model"
+	"ms-blogs/repo"
+)
+
+type BlogService struct {
+	BlogRepository *repo.BlogRepository
+}
+
+func (service *BlogService) FindBlog(id string) (*model.Blog, error) {
+	blog, err := service.BlogRepository.FindById(id)
+	if err != nil {
+		return nil, fmt.Errorf(fmt.Sprintf("blog with id %s not found", id))
+	}
+	return &blog, nil
+}
+
+func (service *BlogService) Create(blog *model.Blog) error {
+	err := service.BlogRepository.CreateBlog(blog)
+	if err != nil {
+		return err
+	}
+	return nil
+}
