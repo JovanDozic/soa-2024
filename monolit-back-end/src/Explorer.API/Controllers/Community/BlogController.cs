@@ -34,10 +34,15 @@ namespace Explorer.API.Controllers.Community
         }
 
         [AllowAnonymous]
-        [HttpGet("getAll")]
-        public ActionResult<BlogDto> GetAll([FromQuery] int page, [FromQuery] int pageSize)
+        [HttpGet("getAll")] // HERE
+        public async Task<ActionResult<BlogDto>> GetAllAsync([FromQuery] int page, [FromQuery] int pageSize)
         {
-            return CreateResponse(_blogService.GetPaged(page, pageSize));
+            using HttpClient client = new();
+            var response = await client.GetAsync("http://localhost:8080/ms-blogs/all");
+            var content = await response.Content.ReadAsStringAsync();
+            return Ok(content);
+
+            // Classic architecture: return CreateResponse(_blogService.GetPaged(page, pageSize));
         }
 
         [Authorize(Policy = "administratorPolicy")]
@@ -177,6 +182,14 @@ namespace Explorer.API.Controllers.Community
             }
 
             return Ok(false);
+        }
+
+
+        [AllowAnonymous]
+        [HttpGet("ms-testing")]
+        public ActionResult<string> MsTesting()
+        {
+            return Ok("MS Testing");
         }
     }
 }

@@ -15,51 +15,51 @@ export class BlogService {
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
-  addBlog(blog: Blog): Observable<Blog>{
+  addBlog(blog: Blog): Observable<Blog> {
     return this.http.post<Blog>(environment.apiHost + `blog`, blog);
   }
 
-  publishBlog(blogId: number): Observable<Blog>{
+  publishBlog(blogId: number): Observable<Blog> {
     return this.http.patch<Blog>(environment.apiHost + `blog/publish/` + blogId, {});
   }
 
-  getBlog(blogId: number): Observable<Blog>{
+  getBlog(blogId: number): Observable<Blog> {
     return this.http.get<Blog>(environment.apiHost + `blog/get/` + blogId);
   }
 
-    getBlogs(): Observable<PagedResults<Blog>>{
+  getBlogs(): Observable<PagedResults<Blog>> {
     return this.http.get<PagedResults<Blog>>(environment.apiHost + `blog/getAll`);
   }
 
-  getFilteredBlogs(filter: BlogStatus): Observable<Blog[]>{
+  getFilteredBlogs(filter: BlogStatus): Observable<Blog[]> {
     return this.http.get<Blog[]>(environment.apiHost + `blog/getFiltered?filter=` + filter);
   }
 
-  getComments(): Observable<PagedResults<BlogComment>>{
+  getComments(): Observable<PagedResults<BlogComment>> {
     return this.http.get<PagedResults<BlogComment>>(environment.apiHost + `tourist/blogComment/getAll`);
   }
 
-  rateBlog(blogId: number, blogRating: BlogRating): Observable<Blog>{
+  rateBlog(blogId: number, blogRating: BlogRating): Observable<Blog> {
     return this.http.post<Blog>(environment.apiHost + `blog/rate/` + blogId, blogRating);
   }
 
-  updateBlogComment(blogId : number, blogComment : BlogComment) : Observable<Blog> {
+  updateBlogComment(blogId: number, blogComment: BlogComment): Observable<Blog> {
     return this.http.put<Blog>(environment.apiHost + `blog/updateBlogComment/` + blogId, blogComment);
   }
 
-  leaveBlogComment(blogId : number, blogComment : BlogComment) : Observable<Blog> {
+  leaveBlogComment(blogId: number, blogComment: BlogComment): Observable<Blog> {
     return this.http.post<Blog>(environment.apiHost + `blog/commentBlog/` + blogId, blogComment);
   }
-  deleteBlogComment(blogId : number, _blogComment : BlogComment) : Observable<Blog> {
+  deleteBlogComment(blogId: number, _blogComment: BlogComment): Observable<Blog> {
     return this.http.put<Blog>(environment.apiHost + `blog/deleteBlogComment/` + blogId, _blogComment);
   }
 
 
-  reportComment(blogId : number, report : BlogReport) : Observable<Blog> {
+  reportComment(blogId: number, report: BlogReport): Observable<Blog> {
     return this.http.post<Blog>(environment.apiHost + `blog/reportBlogComment/` + blogId, report);
   }
 
-  didUserReportComment(blogId: number, userId: number, comment: BlogComment) : Observable<boolean> {
+  didUserReportComment(blogId: number, userId: number, comment: BlogComment): Observable<boolean> {
     return this.http.get<boolean>(environment.apiHost + `blog/didUserReportComment/` + blogId + `/` + userId + "/" + comment.timeCreated);
   }
 

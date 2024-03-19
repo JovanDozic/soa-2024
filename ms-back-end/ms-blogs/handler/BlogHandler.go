@@ -45,3 +45,8 @@ func (handler *BlogHandler) Create(writer http.ResponseWriter, req *http.Request
 	writer.WriteHeader(http.StatusCreated)
 	writer.Header().Set("Content-Type", "application/json")
 }
+
+func (handler *BlogHandler) GetAll(writer http.ResponseWriter, req *http.Request) {
+	log.Printf("Getting all blogs")
+	writer.WriteHeader(http.StatusOK)
+}

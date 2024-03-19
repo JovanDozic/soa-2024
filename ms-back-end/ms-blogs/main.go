@@ -43,13 +43,15 @@ func main() {
 func startServer(handler *handler.BlogHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/blogs/{id}", handler.Get).Methods("GET")
-	router.HandleFunc("/blogs", handler.Create).Methods("POST")
+	// /ms-blogs/all
+	router.HandleFunc("/ms-blogs/all", handler.GetAll).Methods("GET")
+	router.HandleFunc("/ms-blogs/{id}", handler.Get).Methods("GET")
+	router.HandleFunc("/ms-blogs", handler.Create).Methods("POST")
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 	println("Server starting")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
-// * PowerShell testi1ng:
+// * PowerShell testing:
 // Invoke-WebRequest -Uri "http://127.0.0.1:8080/blogs/aec7e123-233d-4a09-a289-75308ea5b7e6"
