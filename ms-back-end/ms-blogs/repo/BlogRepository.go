@@ -27,3 +27,12 @@ func (repo *BlogRepository) CreateBlog(blog *model.Blog) error {
 	println("Rows affected: ", dbResult.RowsAffected)
 	return nil
 }
+
+func (repo *BlogRepository) GetAll() ([]model.Blog, error) {
+	blogs := []model.Blog{}
+	dbResult := repo.DatabaseConnection.Find(&blogs)
+	if dbResult.Error != nil {
+		return nil, dbResult.Error
+	}
+	return blogs, nil
+}

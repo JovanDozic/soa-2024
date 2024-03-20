@@ -11,19 +11,30 @@ import (
 )
 
 type BlogHandler struct {
-	BlogService *service.BlogService
+	BlogService        *service.BlogService
+	BlogCommentService *service.BlogCommentService
 }
 
 func (handler *BlogHandler) Get(writer http.ResponseWriter, req *http.Request) {
-	id := mux.Vars(req)["id"]
-	log.Printf("Blog with id: %s", id)
+	blogId := mux.Vars(req)["id"]
+	log.Printf("Blog with id: %s", blogId)
 
-	blog, err := handler.BlogService.FindBlog(id)
-	writer.Header().Set("Content-Type", "application/json")
+	blog, err := handler.BlogService.FindBlog(blogId)
 	if err != nil {
 		writer.WriteHeader(http.StatusNotFound)
 		return
 	}
+
+	comments, _ := handler.BlogCommentService.GetByBlogId(blogId)
+
+	var commentPointers []*model.BlogComment
+	for _, comment := range comments {
+		commentPointers = append(commentPointers, &comment)
+	}
+
+	blog.BlogComments = commentPointers
+
+	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
 	json.NewEncoder(writer).Encode(blog)
 }
@@ -48,5 +59,12 @@ func (handler *BlogHandler) Create(writer http.ResponseWriter, req *http.Request
 
 func (handler *BlogHandler) GetAll(writer http.ResponseWriter, req *http.Request) {
 	log.Printf("Getting all blogs")
+	blogs, err := handler.BlogService.GetAll()
+	writer.Header().Set("Content-Type", "application/json")
+	if err != nil {
+		writer.WriteHeader(http.StatusNotFound)
+		return
+	}
 	writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(writer).Encode(blogs)
 }

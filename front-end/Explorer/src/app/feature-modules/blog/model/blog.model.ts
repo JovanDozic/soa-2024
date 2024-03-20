@@ -29,7 +29,7 @@ export enum Vote {
 
 export interface BlogComment {
   userId: number;
-  blogId: number;
+  blogId: string;
   comment: string;
   timeCreated: Date;
   timeUpdated: Date;
@@ -60,7 +60,7 @@ export function convertBlogStatusToString(status: BlogStatus): string {
 }
 
 export interface BlogReport {
-  blogId: number;
+  blogId: string;
   userId: number;
   username: string;
   reportAuthorId: number;

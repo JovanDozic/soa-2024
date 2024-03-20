@@ -7,7 +7,6 @@ import (
 	"ms-blogs/repo"
 	"ms-blogs/service"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 	"gorm.io/driver/postgres"
@@ -22,8 +21,10 @@ func initDB() *gorm.DB {
 		return nil
 	}
 
-	database.AutoMigrate(&model.Blog{})
-	database.Exec("INSERT INTO blogs VALUES ('aec7e123-233d-4a09-a289-75308ea5b7e6', 'Naslov Bloga', 'Opis Bloga', " + strconv.Itoa(int(model.BlogStatusDraft)) + ", '2021-01-01 10:10:10')")
+	err = database.AutoMigrate(&model.Blog{}, &model.BlogComment{})
+	if err != nil {
+		log.Fatalf("Error migrating models: %v", err)
+	}
 	return database
 }
 
@@ -33,20 +34,29 @@ func main() {
 		print("FAILED TO CONNECT TO DB")
 		return
 	}
-	repo := &repo.BlogRepository{DatabaseConnection: database}
-	service := &service.BlogService{BlogRepository: repo}
-	handler := &handler.BlogHandler{BlogService: service}
 
-	startServer(handler)
+	blogCommentRepo := &repo.BlogCommentRepository{DatabaseConnection: database}
+	blogCommentService := &service.BlogCommentService{BlogCommentRepository: blogCommentRepo}
+	blogCommentHandler := &handler.BlogCommentHandler{BlogCommentService: blogCommentService}
+
+	blogRepo := &repo.BlogRepository{DatabaseConnection: database}
+	blogService := &service.BlogService{BlogRepository: blogRepo}
+	blogHandler := &handler.BlogHandler{BlogService: blogService, BlogCommentService: blogCommentService}
+
+	startServer(blogHandler, blogCommentHandler)
 }
 
-func startServer(handler *handler.BlogHandler) {
+func startServer(blogHandler *handler.BlogHandler, blogCommentHandler *handler.BlogCommentHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
-	// /ms-blogs/all
-	router.HandleFunc("/ms-blogs/all", handler.GetAll).Methods("GET")
-	router.HandleFunc("/ms-blogs/{id}", handler.Get).Methods("GET")
-	router.HandleFunc("/ms-blogs", handler.Create).Methods("POST")
+	// /ms-blogs/
+	//"http://localhost:8080/ms-blogs/blogs/all"
+	router.HandleFunc("/ms-blogs/blogs/all", blogHandler.GetAll).Methods("GET")
+	router.HandleFunc("/ms-blogs/blogs/{id}", blogHandler.Get).Methods("GET")
+	router.HandleFunc("/ms-blogs/blogs", blogHandler.Create).Methods("POST")
+
+	// /ms-blogs/comments/
+	router.HandleFunc("/ms-blogs/comments/{blogId}", blogCommentHandler.GetByBlogId).Methods("GET")
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 	println("Server starting")

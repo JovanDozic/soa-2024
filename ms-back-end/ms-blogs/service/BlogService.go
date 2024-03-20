@@ -25,3 +25,11 @@ func (service *BlogService) Create(blog *model.Blog) error {
 	}
 	return nil
 }
+
+func (service *BlogService) GetAll() ([]model.Blog, error) {
+	blogs, err := service.BlogRepository.GetAll()
+	if err != nil {
+		return nil, err
+	}
+	return blogs, nil
+}
