@@ -25,6 +25,7 @@ func (handler *BlogHandler) Get(writer http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// TODO: Move this to a repository
 	comments, _ := handler.BlogCommentService.GetByBlogId(blogId)
 
 	var commentPointers []*model.BlogComment

@@ -14,3 +14,5 @@ type BlogComment struct {
 	TimeCreated time.Time `json:"timeCreated"`
 	TimeUpdated time.Time `json:"timeUpdated"`
 }
+
+// TODO: Before create
