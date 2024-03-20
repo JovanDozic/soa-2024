@@ -34,7 +34,7 @@ public class BaseApiController : ControllerBase
         {
             sb.Append(error);
             error.Metadata.TryGetValue("subCode", out var subCode);
-            if(subCode != null)
+            if (subCode != null)
             {
                 sb.Append(';');
                 sb.Append(subCode);

@@ -1,8 +1,11 @@
 ﻿using Explorer.Blog.API.Dtos;
 using Explorer.Blog.API.Public;
+using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Stakeholders.API.Public;
+using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using static Explorer.Blog.API.Enums.BlogEnums;
 
 namespace Explorer.API.Controllers.Community
@@ -12,6 +15,9 @@ namespace Explorer.API.Controllers.Community
     {
         private readonly IBlogService _blogService;
         private readonly IUserService _userService;
+        private readonly string _msBlogUrl = "http://localhost:8080/ms-blogs";
+        static readonly HttpClient _client = new();
+
         public BlogController(IBlogService blogService, IUserService userService)
         {
             _blogService = blogService;
@@ -27,17 +33,48 @@ namespace Explorer.API.Controllers.Community
         }
 
         [AllowAnonymous]
-        [HttpGet("get/{blogId:int}")]
-        public ActionResult<BlogDto> Get([FromRoute] int blogId)
+        [HttpGet("get/{blogId}")] // * Updated for Go implementation
+        public async Task<ActionResult<PagedResult<BlogDto>>> GetAsync([FromRoute] string blogId)
         {
-            return CreateResponse(_blogService.Get(blogId));
+            string uri = $"{_msBlogUrl}/blogs/{blogId}";
+            using HttpResponseMessage response = await _client.GetAsync(uri);
+            if (!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode);
+            }
+
+            string content = await response.Content.ReadAsStringAsync();
+
+            return CreateResponse(content.ToResult());
+
+            //string uri = $"{_msBlogUrl}/blogs/{blogId}";
+            //using HttpResponseMessage response = await _client.GetAsync(uri);
+            //if (!response.IsSuccessStatusCode)
+            //{
+            //    return StatusCode((int)response.StatusCode);
+            //}
+
+            //string content = await response.Content.ReadAsStringAsync();
+            //var blog = JsonConvert.DeserializeObject<BlogDto>(content);
+            //return Ok(blog);
         }
 
         [AllowAnonymous]
-        [HttpGet("getAll")]
-        public ActionResult<BlogDto> GetAll([FromQuery] int page, [FromQuery] int pageSize)
+        [HttpGet("getAll")] // * Updated for Go implementation
+        public async Task<ActionResult<BlogDto>> GetAllAsync([FromQuery] int page, [FromQuery] int pageSize)
         {
-            return CreateResponse(_blogService.GetPaged(page, pageSize));
+            string uri = $"{_msBlogUrl}/blogs/all";
+            using HttpResponseMessage response = await _client.GetAsync(uri);
+            if (!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode);
+            }
+
+            string content = await response.Content.ReadAsStringAsync();
+            var blogs = JsonConvert.DeserializeObject<List<BlogDto>>(content);
+            var pagedResult = new PagedResult<BlogDto>(blogs, blogs.Count);
+
+            return Ok(pagedResult);
         }
 
         [Authorize(Policy = "administratorPolicy")]
@@ -177,6 +214,14 @@ namespace Explorer.API.Controllers.Community
             }
 
             return Ok(false);
+        }
+
+
+        [AllowAnonymous]
+        [HttpGet("ms-testing")]
+        public ActionResult<string> MsTesting()
+        {
+            return Ok("MS Testing");
         }
     }
 }
