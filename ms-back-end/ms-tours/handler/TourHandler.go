@@ -18,7 +18,16 @@ type TourHandler struct {
 func (handler *TourHandler) Get(writer http.ResponseWriter, req *http.Request) {
 	id := mux.Vars(req)["id"]
 	log.Printf("Tour with id %s", id)
+	tour, err := handler.TourService.FindTour(id)
+	jsonResponse, _ := json.Marshal(tour)
+	if err != nil {
+		log.Printf("%s", err)
+		http.Error(writer, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
+	writer.Write(jsonResponse)
 }
 
 func (handler *TourHandler) Create(writer http.ResponseWriter, request *http.Request) {
