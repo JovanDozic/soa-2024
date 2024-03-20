@@ -30,7 +30,7 @@ func initDB() *gorm.DB {
 	}
 
 	// Insert initial data
-	database.Exec("INSERT INTO tours (id, name) VALUES ($1, $2) ON CONFLICT DO NOTHING", "aec7e123-233d-4a09-a289-75308ea5b7e6", "Marko Markovic", "Graficki dizajn")
+	//database.Exec("INSERT INTO tours (id, name) VALUES ($1, $2) ON CONFLICT DO NOTHING", "aec7e123-233d-4a09-a289-75308ea5b7e6", "Prva tura")
 
 	return database
 }
@@ -43,7 +43,7 @@ func startServer(handler *handler.TourHandler) {
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 	log.Println("Server starting")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8081", router))
 }
 
 func main() {
