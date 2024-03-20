@@ -1,6 +1,4 @@
-﻿using Explorer.Blog.API.Dtos;
 using Explorer.Blog.Core.Domain;
-using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Public.Administration;
 using Explorer.Tours.Core.Domain.Tours;
@@ -8,6 +6,7 @@ using FluentResults;
 using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;
@@ -85,7 +84,7 @@ namespace Explorer.API.Controllers.Author.Tour
         [HttpPost]
         public async Task<ActionResult<TourDto>> Create([FromBody] TourDto tour)
         {
-            string uri = $"{_msToursUrl}/tours/create-tour";
+            string uri = $"{_msToursUrl}/tours/createTour";
             string tourJson = JsonConvert.SerializeObject(tour);
             HttpContent httpContent = new StringContent(tourJson, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await _client.PostAsync(uri, httpContent);
