@@ -25,8 +25,8 @@ func (handler *TourHandler) Get(writer http.ResponseWriter, req *http.Request) {
 		http.Error(writer, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	//writer.Header().Set("Content-Type", "application/json")
-	//writer.WriteHeader(http.StatusOK)
+	writer.Header().Set("Content-Type", "application/json")
+	writer.WriteHeader(http.StatusOK)
 	writer.Write(jsonResponse)
 }
 
