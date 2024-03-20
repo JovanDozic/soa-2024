@@ -1,9 +1,9 @@
 package model
 
 import (
+	"math/rand"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -17,7 +17,7 @@ const (
 )
 
 type Tour struct {
-	Id            uuid.UUID       `json:"id"`
+	Id            int64           `json:"id"`
 	Name          string          `json:"name"`
 	Description   string          `json:"description"`
 	Difficult     int             `json:"difficult"`
@@ -28,7 +28,7 @@ type Tour struct {
 	PublishTime   time.Time       `json:"publishTime"`
 	ArchiveTime   time.Time       `json:"archiveTime"`
 	Points        []*Point        `json:"points" gorm:"type:jsonb;"`
-	Tags          []*Tag          `json:"tags" gorm:"type:string"`
+	Tags          []*Tag          `json:"tags" gorm:"type:jsonb;"`
 	TourReviews   []*TourReview   `json:"tourReviews" gorm:"type:jsonb;"`
 	RequiredTimes []*RequiredTime `json:"requiredTimes" gorm:"type:jsonb;"`
 	Problems      []*Problem      `json:"problems" gorm:"type:jsonb;"`
@@ -36,6 +36,8 @@ type Tour struct {
 }
 
 func (tour *Tour) BeforeCreate(scope *gorm.DB) error {
-	tour.Id = uuid.New()
+	//tour.Id = uuid.New()
+	rand.Seed(time.Now().UnixNano())
+	tour.Id = rand.Int63()
 	return nil
 }

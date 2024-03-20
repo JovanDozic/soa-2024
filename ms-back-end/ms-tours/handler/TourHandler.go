@@ -33,14 +33,17 @@ func (handler *TourHandler) Get(writer http.ResponseWriter, req *http.Request) {
 func (handler *TourHandler) Create(writer http.ResponseWriter, request *http.Request) {
 	var tour model.Tour
 	err := json.NewDecoder(request.Body).Decode(&tour)
+
+	log.Printf("%v", tour)
 	if err != nil {
 		println("Error while parsing json")
+		log.Printf(err.Error())
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	err = handler.TourService.Create(&tour)
 	if err != nil {
-		println("Error while creating a new student")
+		println("Error while creating a new tour")
 		writer.WriteHeader(http.StatusExpectationFailed)
 		return
 	}
