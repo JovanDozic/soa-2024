@@ -21,7 +21,7 @@ func (repo *BlogCommentRepository) FindById(id string) (model.BlogComment, error
 	return blogComment, nil
 }
 
-func (repo *BlogCommentRepository) CreateBlogComment(blogComment *model.BlogComment) error {
+func (repo *BlogCommentRepository) Create(blogComment *model.BlogComment) error {
 	dbResult := repo.DatabaseConnection.Create(blogComment)
 	if dbResult.Error != nil {
 		return dbResult.Error

@@ -61,7 +61,8 @@ export class BlogService {
   }
 
   didUserReportComment(blogId: string, userId: number, comment: BlogComment): Observable<boolean> {
-    return this.http.get<boolean>(environment.apiHost + `blog/didUserReportComment/` + blogId + `/` + userId + "/" + comment.timeCreated);
+    const uri = environment.apiHost + `blog/didUserReportComment/` + blogId + `/` + userId;
+    return this.http.put<boolean>(uri, comment);
   }
 
   getReviewedReports(): Observable<BlogReport[]> {

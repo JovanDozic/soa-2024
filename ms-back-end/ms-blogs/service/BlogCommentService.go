@@ -22,7 +22,7 @@ func (service *BlogCommentService) FindBlogComment(id string) (*model.BlogCommen
 }
 
 func (service *BlogCommentService) Create(blogComment *model.BlogComment) error {
-	err := service.BlogCommentRepository.CreateBlogComment(blogComment)
+	err := service.BlogCommentRepository.Create(blogComment)
 	if err != nil {
 		return err
 	}

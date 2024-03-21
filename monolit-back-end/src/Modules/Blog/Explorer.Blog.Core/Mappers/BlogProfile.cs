@@ -52,7 +52,7 @@ public class BlogProfile : Profile
                             ReportAuthorId = (int)x.ReportAuthorId,
                             ReportReason = (BlogEnums.ReportReason)x.ReportReason,
                             IsReviewed = x.IsReviewed,
-                            BlogId = (int)x.BlogId,
+                            BlogId = x.BlogId,
                             Comment = x.Comment,
                             IsAccepted = x.IsAccepted
                         })));
