@@ -233,6 +233,8 @@ namespace Explorer.API.Controllers.Community
 
         [Authorize(Policy = "authorOrTouristPolicy")]
         [HttpPut("didUserReportComment/{blogId}/{userId:int}")] // * Updated for Go implementation
+        // 'https://localhost:44333/api/blog/didUserReportComment/aec7e123-233d-4a09-a289-75308ea5b7e6/-23/2024-03-20T12:40:30+01:00'
+
         public async Task<ActionResult<bool>> DidUserReportCommentAsync([FromRoute] string blogId, [FromRoute] int userId, [FromBody] BlogCommentDto comment)
         {
             string uri = $"{_msBlogUrl}/comments/reports/didUserReport/{userId}/{blogId}";
