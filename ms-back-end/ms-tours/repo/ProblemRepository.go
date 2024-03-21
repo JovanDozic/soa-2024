@@ -1,10 +1,11 @@
 package repo
 
 import (
+	"fmt"
+
 	"gorm.io/gorm"
 
 	"ms-tours/model"
-
 )
 
 type ProblemRepository struct {
@@ -21,6 +22,7 @@ func (repo *ProblemRepository) FindById(id string) (model.Problem, error) {
 }
 
 func (repo *ProblemRepository) FindForTourist(id string) (model.Problem, error) {
+	fmt.Print("Creating Repository...")
 	problem := model.Problem{}
 	dbResult := repo.DatabaseConnection.First(&problem, "touristId = ?", id)
 	if dbResult.Error != nil {

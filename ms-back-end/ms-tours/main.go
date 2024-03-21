@@ -12,6 +12,7 @@ import (
 	"ms-tours/model"
 	"ms-tours/repo"
 	"ms-tours/service"
+
 )
 
 func initDB() *gorm.DB {
@@ -23,8 +24,7 @@ func initDB() *gorm.DB {
 
 	// AutoMigrate will create the table if it does not exist and will
 	// automigrate it if there are any schema changes
-	database.Exec("CREATE SCHEMA IF NOT EXISTS tours")
-	err = database.AutoMigrate(&model.Tour{})
+	err = database.AutoMigrate(&model.Tour{}, &model.Problem{})
 	if err != nil {
 		log.Fatalf("Failed to auto migrate database: %v", err)
 	}
@@ -40,7 +40,7 @@ func startServer(handler *handler.TourHandler, problemHandler *handler.ProblemHa
 
 	router.HandleFunc("/tours/{id}", handler.Get).Methods("GET")
 	router.HandleFunc("/tours", handler.Create).Methods("POST")
-	router.HandleFunc("/createProblem", problemHandler.Create).Methods("POST")
+	router.HandleFunc("/ms-tours/createProblem", problemHandler.Create).Methods("POST")
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 	log.Println("Server starting")

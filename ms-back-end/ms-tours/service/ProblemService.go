@@ -5,6 +5,7 @@ import (
 
 	"ms-tours/model"
 	"ms-tours/repo"
+
 )
 
 type ProblemService struct {
@@ -28,6 +29,7 @@ func (service *ProblemService) FindProblemForTourist(id string) (*model.Problem,
 }
 
 func (service *ProblemService) Create(problem *model.Problem) error {
+	fmt.Print("Service creating")
 	err := service.ProblemRepository.Create(problem)
 	if err != nil {
 		return err

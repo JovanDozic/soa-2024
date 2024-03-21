@@ -2,12 +2,14 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
 
 	"ms-tours/model"
 	"ms-tours/service"
+
 )
 
 type ProblemHandler struct {
@@ -39,6 +41,7 @@ func (handler *ProblemHandler) GetAllForTourist(writer http.ResponseWriter, requ
 }
 
 func (handler *ProblemHandler) Create(writer http.ResponseWriter, request *http.Request) {
+	fmt.Println("Creating problem...")
 	var problem model.Problem
 	err := json.NewDecoder(request.Body).Decode(&problem)
 	if err != nil {

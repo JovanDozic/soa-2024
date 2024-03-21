@@ -31,7 +31,7 @@ namespace Explorer.Tours.Core.UseCases.Administration
             {
                 foreach (ProblemDto p in tour.Problems)
                 {
-                    if (p.Id == id && tour.Id == 2)
+                    if (Convert.ToInt64(p.Id)== id && tour.Id == 2)
                     {
                         if (!p.IsSolved)
                         {
@@ -79,7 +79,7 @@ namespace Explorer.Tours.Core.UseCases.Administration
             {
                 foreach (ProblemDto p in tour.Problems)
                 {
-                    if (p.Id == id && tour.Id == 2)
+                    if (Convert.ToInt64(p.Id) == id && tour.Id == 2)
                     {
                         p.IsSolved = false;
                         p.UnsolvedProblemComment = comment;
@@ -99,7 +99,7 @@ namespace Explorer.Tours.Core.UseCases.Administration
             {
                 foreach (ProblemDto p in tour.Problems)
                 {
-                    if (p.Id == id && tour.Id == 2)
+                    if (Convert.ToInt64(p.Id) == id && tour.Id == 2)
                     {
                         p.IsSolved = true;
                         problem = p;

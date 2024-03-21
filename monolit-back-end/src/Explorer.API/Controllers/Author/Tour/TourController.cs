@@ -5,6 +5,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.Json;
 
 namespace Explorer.API.Controllers.Author.Tour
@@ -116,17 +117,39 @@ namespace Explorer.API.Controllers.Author.Tour
 
         public async Task<ActionResult<ProblemDto>> AddProblem([FromRoute] int tourId, [FromBody] ProblemDto problem)
         {
-            string payload = JsonSerializer.Serialize(problem);
-            string uri = $"{_msTourUrl}/createProblem";
-            using HttpResponseMessage response = await _client.PostAsync(uri, payload);
-            if(!response.IsSuccessStatusCode)
+            try
             {
-                return StatusCode((int)response.StatusCode);
-            }
-            string content = await response.Content.ReadAsStringAsync();
+                string payload = JsonSerializer.Serialize(problem);
+                string uri = $"{_msTourUrl}/createProblem";
 
-            return CreateResponse(content.ToResult());
+                // Convert the payload to StringContent for the request body
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+
+                // Send the POST request
+                using HttpResponseMessage response = await _client.PostAsync(uri, content);
+
+                // Check if the request was successful
+                if (!response.IsSuccessStatusCode)
+                {
+                    // If the request failed, return the status code as the response
+                    return StatusCode((int)response.StatusCode);
+                }
+
+                // If the request was successful, read the response content
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                // Assuming CreateResponse is a method to handle the response content,
+                // convert it to a ProblemDto and return it
+                return CreateResponse(responseContent.ToResult());
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions that occur during the request
+                // You can log the exception or return an appropriate error response
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
+
 
         [AllowAnonymous]
         [HttpGet("averageRating/{tourId:int}")]

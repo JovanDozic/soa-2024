@@ -56,7 +56,7 @@ namespace Explorer.Tours.Core.UseCases.Administration
             try
             {
                 var count = tour.Problems.Count();
-                problemDto.Id = count + 1;
+                problemDto.Id = (count + 1).ToString();
                 tour.Problems.Add(problemDto);
                 CrudRepository.Update(tour);
 

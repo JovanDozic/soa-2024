@@ -8,7 +8,7 @@ namespace Explorer.Tours.API.Dtos.Tours
 {
     public class ProblemDto
     {
-        public long Id { get; set; }
+        public string? Id { get; set; }
         public string Category { get; set; }
         public bool Priority { get; set; }
         public string Description { get; set; }
