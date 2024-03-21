@@ -60,11 +60,11 @@ namespace Explorer.Blog.Tests.Integration.Blog
             using var scope = Factory.Services.CreateScope();
             var controller = CreateController(scope);
             var updatedEntity = new API.Dtos.BlogDto
-            { 
+            {
                 UserId = -1,
                 Description = "Test",
                 CreationDate = DateTime.Now,
-                Images = new string[] {},
+                Images = new string[] { },
             };
 
             var result = (ObjectResult)controller.Create(updatedEntity).Result;

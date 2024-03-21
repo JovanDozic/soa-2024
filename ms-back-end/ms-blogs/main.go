@@ -21,7 +21,7 @@ func initDB() *gorm.DB {
 		return nil
 	}
 
-	err = database.AutoMigrate(&model.Blog{}, &model.BlogComment{})
+	err = database.AutoMigrate(&model.Blog{}, &model.BlogComment{}, &model.BlogCommentReport{})
 	if err != nil {
 		log.Fatalf("Error migrating models: %v", err)
 	}
@@ -35,6 +35,10 @@ func main() {
 		return
 	}
 
+	blogCommentReportRepo := &repo.BlogCommentReportRepository{DatabaseConnection: database}
+	blogCommentReportService := &service.BlogCommentReportService{Repository: blogCommentReportRepo}
+	blogCommentReportHandler := &handler.BlogCommentReportHandler{BlogCommentReportService: blogCommentReportService}
+
 	blogCommentRepo := &repo.BlogCommentRepository{DatabaseConnection: database}
 	blogCommentService := &service.BlogCommentService{BlogCommentRepository: blogCommentRepo}
 	blogCommentHandler := &handler.BlogCommentHandler{BlogCommentService: blogCommentService}
@@ -43,10 +47,10 @@ func main() {
 	blogService := &service.BlogService{BlogRepository: blogRepo}
 	blogHandler := &handler.BlogHandler{BlogService: blogService, BlogCommentService: blogCommentService}
 
-	startServer(blogHandler, blogCommentHandler)
+	startServer(blogHandler, blogCommentHandler, blogCommentReportHandler)
 }
 
-func startServer(blogHandler *handler.BlogHandler, blogCommentHandler *handler.BlogCommentHandler) {
+func startServer(blogHandler *handler.BlogHandler, blogCommentHandler *handler.BlogCommentHandler, blogCommentReportHandler *handler.BlogCommentReportHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
 	// /ms-blogs/
@@ -57,8 +61,16 @@ func startServer(blogHandler *handler.BlogHandler, blogCommentHandler *handler.B
 
 	// /ms-blogs/comments/
 	router.HandleFunc("/ms-blogs/comments/{blogId}", blogCommentHandler.GetByBlogId).Methods("GET")
-	router.HandleFunc("/ms-blogs/comments/add/{blogId}", blogCommentHandler.Add).Methods("POST")
+	router.HandleFunc("/ms-blogs/comments/add/{blogId}", blogCommentHandler.Create).Methods("POST")
 	router.HandleFunc("/ms-blogs/comments/delete/{blogId}", blogCommentHandler.Delete).Methods("PUT")
+
+	// /ms-blogs/comments/reports/
+
+	router.HandleFunc("/ms-blogs/comments/reports/didUserReport/{userId}/{blogId}", blogCommentReportHandler.DidUserReportComment).Methods("PUT")
+
+	router.HandleFunc("/ms-blogs/comments/reports/all", blogCommentReportHandler.GetAll).Methods("GET")
+	router.HandleFunc("/ms-blogs/comments/reports/{blogId}", blogCommentReportHandler.GetByBlogId).Methods("GET")
+	router.HandleFunc("/ms-blogs/comments/reports", blogCommentReportHandler.Create).Methods("POST")
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 	println("Server starting")

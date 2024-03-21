@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using Explorer.Blog.API.Enums;
+﻿using Explorer.Blog.API.Enums;
 using Explorer.BuildingBlocks.Core.Domain;
 
 namespace Explorer.Blog.Core.Domain
@@ -14,16 +8,16 @@ namespace Explorer.Blog.Core.Domain
         public int UserId { get; init; }
         public DateTime TimeCommentCreated { get; init; }
         public DateTime TimeReported { get; init; }
-        public int ReportAuthorId {get; init; }
+        public int ReportAuthorId { get; init; }
         public BlogEnums.ReportReason ReportReason { get; init; }
         public bool IsReviewed { get; private set; } = false;
-        public int BlogId { get; init; }
+        public string BlogId { get; init; }
         public string Comment { get; init; }
         public bool? IsAccepted { get; private set; } = null;
         public Report() { }
 
         [Newtonsoft.Json.JsonConstructor]
-        public Report(int userId, DateTime timeCommentCreated, DateTime timeReported, int reportAuthorId, BlogEnums.ReportReason reportReason, bool isReviewed, int blogId, string comment, bool? isAccepted)
+        public Report(int userId, DateTime timeCommentCreated, DateTime timeReported, int reportAuthorId, BlogEnums.ReportReason reportReason, bool isReviewed, string blogId, string comment, bool? isAccepted)
         {
             UserId = userId;
             TimeCommentCreated = timeCommentCreated;
