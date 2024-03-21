@@ -6,6 +6,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Text;
 using static Explorer.Blog.API.Enums.BlogEnums;
 
 namespace Explorer.API.Controllers.Community
@@ -145,10 +146,24 @@ namespace Explorer.API.Controllers.Community
         }
 
         [Authorize(Policy = "authorOrTouristPolicy")]
-        [HttpPost("commentBlog/{blogId:int}")]
-        public ActionResult<BlogCommentDto> CommentBlog([FromRoute] int blogId, [FromBody] BlogCommentDto comment)
+        [HttpPost("commentBlog/{blogId}")] // * Updated for Go implementation
+        public async Task<ActionResult<BlogCommentDto>> CommentBlogAsync([FromRoute] string blogId, [FromBody] BlogCommentDto comment)
         {
-            return CreateResponse(_blogService.CommentBlog(blogId, comment));
+            string uri = $"{_msBlogUrl}/comments/add/{blogId}";
+            comment.BlogId = blogId; // Just in case
+
+            var json = JsonConvert.SerializeObject(comment);
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using HttpResponseMessage response = await _client.PostAsync(uri, data);
+            if (!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode);
+            }
+
+            string content = await response.Content.ReadAsStringAsync();
+            var blogComment = JsonConvert.DeserializeObject<BlogCommentDto>(content);
+            return Ok(blogComment);
         }
 
         [Authorize(Policy = "authorOrTouristPolicy")]
@@ -175,10 +190,24 @@ namespace Explorer.API.Controllers.Community
         }
 
         [Authorize(Policy = "authorOrTouristPolicy")]
-        [HttpPut("deleteBlogComment/{blogId:int}")]
-        public ActionResult<BlogCommentDto> DeleteBlogComment([FromRoute] int blogId, [FromBody] BlogCommentDto comment)
+        [HttpPut("deleteBlogComment/{blogId}")] // * Updated for Go implementation
+        public async Task<ActionResult<BlogCommentDto>> DeleteBlogCommentAsync([FromRoute] string blogId, [FromBody] BlogCommentDto comment)
         {
-            return CreateResponse(_blogService.DeleteComment(blogId, comment));
+            string uri = $"{_msBlogUrl}/comments/delete/{blogId}";
+            comment.BlogId = blogId;
+
+            var json = JsonConvert.SerializeObject(comment);
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using HttpResponseMessage response = await _client.PutAsync(uri, data);
+            if (!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode);
+            }
+
+            string content = response.Content.ReadAsStringAsync().Result;
+            var blogComment = JsonConvert.DeserializeObject<BlogCommentDto>(content);
+            return Ok(blogComment);
         }
 
         [Authorize(Policy = "administratorPolicy")]

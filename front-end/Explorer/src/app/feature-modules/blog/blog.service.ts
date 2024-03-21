@@ -50,6 +50,7 @@ export class BlogService {
   leaveBlogComment(blogId: string, blogComment: BlogComment): Observable<Blog> {
     return this.http.post<Blog>(environment.apiHost + `blog/commentBlog/` + blogId, blogComment);
   }
+  
   deleteBlogComment(blogId: string, _blogComment: BlogComment): Observable<Blog> {
     return this.http.put<Blog>(environment.apiHost + `blog/deleteBlogComment/` + blogId, _blogComment);
   }

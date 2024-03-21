@@ -152,13 +152,14 @@ export class DetailedBlogComponent {
                 comment: this.commentForm.value.comment,
                 timeCreated: new Date(),
                 timeUpdated: new Date(),
-                username: this.user?.username ?? 'turistaMarko'
+                username: this.user?.username ?? 'null username'
             };
 
             this.service.leaveBlogComment(this.blogId, newComment).subscribe(() => {
-                if (this.blog.blogComments != null) {
-                    this.blog.blogComments.push(newComment);
+                if (this.blog.blogComments == null) {
+                    this.blog.blogComments = [];
                 }
+                this.blog.blogComments.push(newComment);
                 this.commentForm.reset();
                 this.addingComment = false;
             });

@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"ms-blogs/model"
 	"ms-blogs/repo"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 type BlogCommentService struct {
@@ -40,4 +43,12 @@ func (service *BlogCommentService) GetByBlogId(blogId string) ([]model.BlogComme
 		return nil, err
 	}
 	return blogComments, nil
+}
+
+func (service *BlogCommentService) Delete(blogId uuid.UUID, commentCreateTime time.Time) error {
+	err := service.BlogCommentRepository.Delete(blogId, commentCreateTime)
+	if err != nil {
+		return err
+	}
+	return nil
 }

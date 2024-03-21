@@ -57,6 +57,8 @@ func startServer(blogHandler *handler.BlogHandler, blogCommentHandler *handler.B
 
 	// /ms-blogs/comments/
 	router.HandleFunc("/ms-blogs/comments/{blogId}", blogCommentHandler.GetByBlogId).Methods("GET")
+	router.HandleFunc("/ms-blogs/comments/add/{blogId}", blogCommentHandler.Add).Methods("POST")
+	router.HandleFunc("/ms-blogs/comments/delete/{blogId}", blogCommentHandler.Delete).Methods("PUT")
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 	println("Server starting")

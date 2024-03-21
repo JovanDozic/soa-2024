@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Explorer.Blog.API.Dtos;
+﻿using Explorer.Blog.API.Dtos;
 using Explorer.Blog.Core.Domain;
 
 namespace Explorer.Blog.Core.Converters
@@ -19,7 +14,7 @@ namespace Explorer.Blog.Core.Converters
             return new BlogCommentDto
             {
                 UserId = (int)blogComment.UserId,
-                BlogId = (int)blogComment.BlogId,
+                BlogId = blogComment.BlogId,
                 Comment = blogComment.Comment,
                 TimeCreated = blogComment.TimeCreated,
                 TimeUpdated = blogComment.TimeUpdated
