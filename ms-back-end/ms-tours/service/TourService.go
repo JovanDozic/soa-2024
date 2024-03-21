@@ -2,10 +2,8 @@ package service
 
 import (
 	"fmt"
-
 	"ms-tours/model"
 	"ms-tours/repo"
-
 )
 
 type TourService struct {
@@ -26,4 +24,12 @@ func (service *TourService) Create(tour *model.Tour) error {
 		return err
 	}
 	return nil
+}
+
+func (service *TourService) GetAll() ([]model.Tour, error) {
+	tours, err := service.TourRepository.GetAll()
+	if err != nil {
+		return nil, err
+	}
+	return tours, nil
 }

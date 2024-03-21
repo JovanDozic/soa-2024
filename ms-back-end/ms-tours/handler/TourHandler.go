@@ -30,17 +30,33 @@ func (handler *TourHandler) Get(writer http.ResponseWriter, req *http.Request) {
 	writer.Write(jsonResponse)
 }
 
+func (handler *TourHandler) GetAll(writer http.ResponseWriter, req *http.Request) {
+	log.Printf("Usao u getall")
+	tours, err := handler.TourService.GetAll()
+	if err != nil {
+		log.Printf("%s", err)
+		http.Error(writer, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	writer.Header().Set("Content-Type", "application/json")
+	writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(writer).Encode(tours)
+}
+
 func (handler *TourHandler) Create(writer http.ResponseWriter, request *http.Request) {
 	var tour model.Tour
 	err := json.NewDecoder(request.Body).Decode(&tour)
+
+	log.Printf("%v", tour)
 	if err != nil {
 		println("Error while parsing json")
+		log.Printf(err.Error())
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	err = handler.TourService.Create(&tour)
 	if err != nil {
-		println("Error while creating a new student")
+		println("Error while creating a new tour")
 		writer.WriteHeader(http.StatusExpectationFailed)
 		return
 	}
