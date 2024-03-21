@@ -20,6 +20,15 @@ func (repo *TourRepository) FindById(id string) (model.Tour, error) {
 	return tour, nil
 }
 
+func (repo *TourRepository) GetAll() ([]model.Tour, error) {
+	tours := []model.Tour{}
+	dbResult := repo.DatabaseConnection.Find(&tours)
+	if dbResult.Error != nil {
+		return nil, dbResult.Error
+	}
+	return tours, nil
+}
+
 func (repo *TourRepository) CreateTour(tour *model.Tour) error {
 	dbResult := repo.DatabaseConnection.Create(tour)
 	if dbResult.Error != nil {

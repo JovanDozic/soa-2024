@@ -38,7 +38,8 @@ func startServer(handler *handler.TourHandler, problemHandler *handler.ProblemHa
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/ms-tours/tours/{id}", handler.Get).Methods("GET")
-	router.HandleFunc("/ms-tours/tours/createTour", handler.Create).Methods("POST")
+	router.HandleFunc("/ms-tours/get-all-tours", handler.GetAll).Methods("GET")
+	router.HandleFunc("/ms-tours/tours/create-tour", handler.Create).Methods("POST")
 	router.HandleFunc("/ms-tours/createProblem", problemHandler.Create).Methods("POST")
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
