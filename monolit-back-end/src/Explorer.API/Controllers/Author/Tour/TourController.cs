@@ -1,4 +1,6 @@
-﻿using Explorer.Blog.Core.Domain;
+﻿using Explorer.Blog.API.Dtos;
+using Explorer.Blog.Core.Domain;
+using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Public.Administration;
 using Explorer.Tours.Core.Domain.Tours;
@@ -28,10 +30,20 @@ namespace Explorer.API.Controllers.Author.Tour
 
         [AllowAnonymous]
         [HttpGet("getAll")]
-        public ActionResult<TourDto> GetAll([FromQuery] int page, [FromQuery] int pageSize)
+        public async Task<ActionResult<TourDto>> GetAllAsync([FromQuery] int page, [FromQuery] int pageSize)
         {
-            var response = CreateResponse(_tourService.GetPaged(page, pageSize));
-            return response;
+            string uri = $"{_msToursUrl}/get-all-tours";
+            using HttpResponseMessage response = await _client.GetAsync(uri);
+            if (!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode);
+            }
+
+            string content = await response.Content.ReadAsStringAsync();
+            var tours = JsonConvert.DeserializeObject<List<TourDto>>(content);
+            var pagedResult = new PagedResult<TourDto>(tours, tours.Count);
+
+            return Ok(pagedResult);
         }
 
         [HttpGet("getAllPublic")]
@@ -73,7 +85,7 @@ namespace Explorer.API.Controllers.Author.Tour
         [HttpPost]
         public async Task<ActionResult<TourDto>> Create([FromBody] TourDto tour)
         {
-            string uri = $"{_msToursUrl}/tours/createTour";
+            string uri = $"{_msToursUrl}/tours/create-tour";
             string tourJson = JsonConvert.SerializeObject(tour);
             HttpContent httpContent = new StringContent(tourJson, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await _client.PostAsync(uri, httpContent);
