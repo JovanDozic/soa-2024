@@ -24,7 +24,7 @@ func initDB() *gorm.DB {
 
 	// AutoMigrate will create the table if it does not exist and will
 	// automigrate it if there are any schema changes
-	err = database.AutoMigrate(&model.Tour{}, &model.Problem{})
+	err = database.AutoMigrate(&model.Tour{}, &model.Problem{}, &model.TourReview{})
 	if err != nil {
 		log.Fatalf("Failed to auto migrate database: %v", err)
 	}
@@ -35,12 +35,13 @@ func initDB() *gorm.DB {
 	return database
 }
 
-func startServer(handler *handler.TourHandler, problemHandler *handler.ProblemHandler) {
+func startServer(handler *handler.TourHandler, problemHandler *handler.ProblemHandler, reviewHandler *handler.TourReviewHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/tours/{id}", handler.Get).Methods("GET")
 	router.HandleFunc("/tours", handler.Create).Methods("POST")
 	router.HandleFunc("/ms-tours/createProblem", problemHandler.Create).Methods("POST")
+	router.HandleFunc("/ms-tours/createReview", reviewHandler.Create).Methods("POST")
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 	log.Println("Server starting")
@@ -53,6 +54,11 @@ func main() {
 		print("FAILED TO CONNECT TO DB")
 		return
 	}
+
+	reviewRepo := &repo.TourReviewRepository{DatabaseConnection: database}
+	reviewService := &service.TourReviewService{TourReviewRepository: reviewRepo}
+	reviewHandler := &handler.TourReviewHandler{TourReviewService: reviewService}
+
 	problemRepo := &repo.ProblemRepository{DatabaseConnection: database}
 	problemService := &service.ProblemService{ProblemRepository: problemRepo}
 	problemHandler := &handler.ProblemHandler{ProblemService: problemService}
@@ -61,5 +67,5 @@ func main() {
 	service := &service.TourService{TourRepository: repo}
 	handler := &handler.TourHandler{TourService: service}
 
-	startServer(handler, problemHandler)
+	startServer(handler, problemHandler, reviewHandler)
 }

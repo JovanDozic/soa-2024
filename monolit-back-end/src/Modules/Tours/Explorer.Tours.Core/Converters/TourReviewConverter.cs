@@ -21,14 +21,14 @@ namespace Explorer.Tours.Core.Converters
                 TouristUsername = tourReview.TouristUsername,
                 TourDate = tourReview.TourDate,
                 CreationDate = tourReview.CreationDate,
-                Images = tourReview.Images,
+                //Images = tourReview.Images,
             };
         }
 
         public static TourReview ToDomain(this TourReviewDto tourReviewDto)
         {
             return tourReviewDto == null ? null :
-                new TourReview(tourReviewDto.Rating, tourReviewDto.Comment, tourReviewDto.TouristId, tourReviewDto.TouristUsername, tourReviewDto.TourDate, tourReviewDto.CreationDate, tourReviewDto.Images);
+                new TourReview(tourReviewDto.Rating, tourReviewDto.Comment, tourReviewDto.TouristId, tourReviewDto.TouristUsername, tourReviewDto.TourDate, tourReviewDto.CreationDate/*, tourReviewDto.Images*/);
         }
     }
 }
