@@ -133,9 +133,30 @@ namespace Explorer.API.Controllers.Author.Tour
         [HttpPost("rateTour/{tourId:int}")]
         [Authorize(Policy = "TouristPolicy")]
 
-        public ActionResult<TourReviewDto> RateTour([FromRoute] int tourId, [FromBody] TourReviewDto tourReview)
+        public async Task<ActionResult<TourReviewDto>> RateTour([FromRoute] int tourId, [FromBody] TourReviewDto tourReview)
         {
-            return CreateResponse(_tourService.RateTour(tourId, tourReview));
+            try
+            {
+                string payload = JsonSerializer.Serialize(tourReview);
+                string uri = $"{_msTourUrl}/createReview";
+
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+
+                using HttpResponseMessage response = await _client.PostAsync(uri, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return StatusCode((int)response.StatusCode);
+                }
+
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                return CreateResponse(responseContent.ToResult());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         [HttpPost("addProblem/{tourId:int}")]
@@ -148,30 +169,21 @@ namespace Explorer.API.Controllers.Author.Tour
                 string payload = System.Text.Json.JsonSerializer.Serialize(problem);
                 string uri = $"{_msToursUrl}/createProblem";
 
-                // Convert the payload to StringContent for the request body
                 var content = new StringContent(payload, Encoding.UTF8, "application/json");
 
-                // Send the POST request
                 using HttpResponseMessage response = await _client.PostAsync(uri, content);
 
-                // Check if the request was successful
                 if (!response.IsSuccessStatusCode)
                 {
-                    // If the request failed, return the status code as the response
                     return StatusCode((int)response.StatusCode);
                 }
 
-                // If the request was successful, read the response content
                 string responseContent = await response.Content.ReadAsStringAsync();
 
-                // Assuming CreateResponse is a method to handle the response content,
-                // convert it to a ProblemDto and return it
                 return CreateResponse(responseContent.ToResult());
             }
             catch (Exception ex)
             {
-                // Handle any exceptions that occur during the request
-                // You can log the exception or return an appropriate error response
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }

@@ -2,6 +2,7 @@ package model
 
 import (
 	"time"
+
 )
 
 type TourReview struct {
@@ -10,6 +11,6 @@ type TourReview struct {
 	TouristId       int       `json:"touristId"`
 	TouristUsername string    `json:"touristUsername"`
 	TourDate        time.Time `json:"tourDate"`
-	CreationTime    time.Time `json:"creationTime"`
-	Images          []*string `json:"images" gorm:"type:jsonb;"`
+	CreationDate    time.Time `json:"creationDate"`
+	//Images          []*string `json:"images" gorm:"type:jsonb;"`
 }

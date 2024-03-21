@@ -9,6 +9,6 @@ namespace Explorer.Tours.API.Dtos.Tours
         public string TouristUsername { get; set; }
         public DateTime TourDate { get; set; }
         public DateTime CreationDate { get; set; }
-        public List<string> Images { get; set; }
+        //public List<string> Images { get; set; }
     }
 }

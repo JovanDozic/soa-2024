@@ -17,10 +17,10 @@ namespace Explorer.Tours.Core.Domain.Tours
 
         public DateTime CreationDate { get; set; } = DateTime.Now;
 
-        public List<string> Images { get; set; }
+        //public List<string> Images { get; set; }
 
         [Newtonsoft.Json.JsonConstructor]
-        public TourReview(int rating, string comment, int touristId, string touristUsername, DateTime tourDate, DateTime creationDate, List<string> images)
+        public TourReview(int rating, string comment, int touristId, string touristUsername, DateTime tourDate, DateTime creationDate/*, List<string> images*/)
         {
             Rating = rating;
             Comment = comment;
@@ -28,7 +28,7 @@ namespace Explorer.Tours.Core.Domain.Tours
             TouristUsername = touristUsername;
             TourDate = tourDate;
             CreationDate = creationDate;
-            Images = images ?? new List<string>();
+            //Images = images ?? new List<string>();
             Validate();
         }
         private void Validate()
@@ -47,7 +47,7 @@ namespace Explorer.Tours.Core.Domain.Tours
             yield return TouristUsername;
             yield return TourDate;
             yield return CreationDate;
-            yield return Images;
+            //yield return Images;
             yield return Comment;
         }
     }
