@@ -32,6 +32,7 @@ type Tour struct {
 	TourReviews   []*TourReview   `json:"tourReviews" gorm:"type:jsonb;"`
 	RequiredTimes []*RequiredTime `json:"requiredTimes" gorm:"type:jsonb;"`
 	Problems      []*Problem      `json:"problems" gorm:"type:jsonb;"`
+	MyOwn         bool            `json:"myOwn"`
 }
 
 func (tour *Tour) BeforeCreate(scope *gorm.DB) error {

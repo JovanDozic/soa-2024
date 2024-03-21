@@ -1,20 +1,9 @@
-﻿using Explorer.BuildingBlocks.Core.UseCases;
-using Explorer.BuildingBlocks.Infrastructure.Database;
-using Explorer.Stakeholders.Core.Domain;
-using Explorer.Tours.API.Dtos;
+﻿using Explorer.BuildingBlocks.Infrastructure.Database;
 using Explorer.Tours.API.Dtos.Tours;
-using Explorer.Tours.Core.Converters;
 using Explorer.Tours.Core.Domain.RepositoryInterfaces;
 using Explorer.Tours.Core.Domain.Tours;
-using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Explorer.Tours.Infrastructure.Database.Repositories
 {

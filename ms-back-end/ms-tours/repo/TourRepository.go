@@ -4,6 +4,7 @@ import (
 	"gorm.io/gorm"
 
 	"ms-tours/model"
+
 )
 
 type TourRepository struct {

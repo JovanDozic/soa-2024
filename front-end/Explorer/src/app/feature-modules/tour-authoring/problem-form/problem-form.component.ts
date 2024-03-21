@@ -44,8 +44,8 @@ export class ProblemFormComponent implements OnChanges {
       this.user = user;
       if(this.user && this.user.role == 'tourist')
         this.openSession();
+        this.getTours();
     })
-    this.getTours();
     
   }
 
@@ -90,21 +90,24 @@ export class ProblemFormComponent implements OnChanges {
   getTours(): void {
     this.service.getTours().subscribe({
       next: (result: PagedResults<Tour>) => {
-        
+        // Filter tours where myOwn is false
         this.tours = result.results.filter(tour => tour.myOwn === false);
-        this.tours_original = this.tours;
-
-        for (const tour of this.tours) {
+        this.tours_original = [...this.tours]; // Make a copy for backup
+        console.log(this.tours);
+        
+        // Calculate average rating for each tour
+        this.tours.forEach(tour => {
           if (tour.id !== undefined) {
             this.calculateAverageRating(tour.id);
           }
-        }
-
+        });
       },
-      error: () => {
+      error: (error: any) => {
+        console.error('Error fetching tours:', error);
       }
-    })
+    });
   }
+  
 
   onProblemClicked(tour: Tour): void {
     this.selectedTour = tour;

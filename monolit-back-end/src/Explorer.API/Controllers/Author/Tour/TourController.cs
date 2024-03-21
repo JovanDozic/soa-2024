@@ -1,9 +1,11 @@
 ﻿using Explorer.Tours.API.Dtos.Tours;
 using Explorer.Tours.API.Public.Administration;
 using Explorer.Tours.Core.Domain.Tours;
+using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Explorer.API.Controllers.Author.Tour
 {
@@ -12,6 +14,8 @@ namespace Explorer.API.Controllers.Author.Tour
     public class TourController : BaseApiController
     {
         private readonly ITourService _tourService;
+        private readonly string _msTourUrl = "http://localhost:8081/ms-tours";
+        static readonly HttpClient _client = new();
 
         public TourController(ITourService tourService)
         {
@@ -22,7 +26,8 @@ namespace Explorer.API.Controllers.Author.Tour
         [HttpGet("getAll")]
         public ActionResult<TourDto> GetAll([FromQuery] int page, [FromQuery] int pageSize)
         {
-            return CreateResponse(_tourService.GetPaged(page, pageSize));
+            var response = CreateResponse(_tourService.GetPaged(page, pageSize));
+            return response;
         }
 
         [HttpGet("getAllPublic")]
@@ -109,9 +114,18 @@ namespace Explorer.API.Controllers.Author.Tour
         [HttpPost("addProblem/{tourId:int}")]
         //[Authorize(Policy = "TouristPolicy")]
 
-        public ActionResult<ProblemDto> AddProblem([FromRoute] int tourId, [FromBody] ProblemDto problem)
+        public async Task<ActionResult<ProblemDto>> AddProblem([FromRoute] int tourId, [FromBody] ProblemDto problem)
         {
-            return CreateResponse(_tourService.AddProblem(tourId, problem));
+            string payload = JsonSerializer.Serialize(problem);
+            string uri = $"{_msTourUrl}/createProblem";
+            using HttpResponseMessage response = await _client.PostAsync(uri, payload);
+            if(!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode);
+            }
+            string content = await response.Content.ReadAsStringAsync();
+
+            return CreateResponse(content.ToResult());
         }
 
         [AllowAnonymous]

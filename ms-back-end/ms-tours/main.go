@@ -35,11 +35,12 @@ func initDB() *gorm.DB {
 	return database
 }
 
-func startServer(handler *handler.TourHandler) {
+func startServer(handler *handler.TourHandler, problemHandler *handler.ProblemHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/tours/{id}", handler.Get).Methods("GET")
 	router.HandleFunc("/tours", handler.Create).Methods("POST")
+	router.HandleFunc("/createProblem", problemHandler.Create).Methods("POST")
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 	log.Println("Server starting")
@@ -52,9 +53,13 @@ func main() {
 		print("FAILED TO CONNECT TO DB")
 		return
 	}
+	problemRepo := &repo.ProblemRepository{DatabaseConnection: database}
+	problemService := &service.ProblemService{ProblemRepository: problemRepo}
+	problemHandler := &handler.ProblemHandler{ProblemService: problemService}
+
 	repo := &repo.TourRepository{DatabaseConnection: database}
 	service := &service.TourService{TourRepository: repo}
 	handler := &handler.TourHandler{TourService: service}
 
-	startServer(handler)
+	startServer(handler, problemHandler)
 }
