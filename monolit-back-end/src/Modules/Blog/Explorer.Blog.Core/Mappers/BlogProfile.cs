@@ -2,7 +2,6 @@
 using Explorer.Blog.API.Dtos;
 using Explorer.Blog.API.Enums;
 using Explorer.Blog.Core.Domain;
-using System.Linq;
 using Vote = Explorer.Blog.Core.Domain.Vote;
 
 namespace Explorer.Blog.Core.Mappers;
@@ -15,7 +14,7 @@ public class BlogProfile : Profile
         CreateMap<BlogDto, Domain.Blog>()
             .ForMember(dest => dest.Ratings, opt =>
                 opt.MapFrom(src =>
-                    src.Ratings.Select( x =>
+                    src.Ratings.Select(x =>
                         new BlogRating(x.UserId, x.VotingDate, (Vote)x.Mark)
                         )))
             .ForMember(dest => dest.BlogComments, opt =>
@@ -24,13 +23,13 @@ public class BlogProfile : Profile
                         new BlogComment(x.UserId, x.BlogId, x.Comment, x.TimeCreated, x.TimeUpdated))))
             .ForMember(dest => dest.Reports, opt =>
                 opt.MapFrom(src =>
-                    src.Reports.Select(x=>
+                    src.Reports.Select(x =>
                         new Report(x.UserId, x.TimeCommentCreated, x.TimeReported, x.ReportAuthorId, (BlogEnums.ReportReason)x.ReportReason, x.IsReviewed, x.BlogId, x.Comment, x.IsAccepted))));
 
         CreateMap<Domain.Blog, BlogDto>()
             .ForMember(dest => dest.Ratings, opt =>
                 opt.MapFrom(src =>
-                    src.Ratings.Select( x =>
+                    src.Ratings.Select(x =>
                         new BlogRatingDto
                         {
                             UserId = (int)x.UserId,
@@ -41,10 +40,10 @@ public class BlogProfile : Profile
             .ForMember(dest => dest.BlogComments, opt =>
                 opt.MapFrom(src =>
                     src.BlogComments.Select(x =>
-                        new BlogCommentDto { UserId = (int)x.UserId, BlogId = (int)x.BlogId, Comment = x.Comment, TimeCreated = x.TimeCreated, TimeUpdated = x.TimeUpdated })))
+                        new BlogCommentDto { UserId = (int)x.UserId, BlogId = x.BlogId, Comment = x.Comment, TimeCreated = x.TimeCreated, TimeUpdated = x.TimeUpdated })))
             .ForMember(dest => dest.Reports, opt =>
                 opt.MapFrom(src =>
-                    src.Reports.Select(x=>
+                    src.Reports.Select(x =>
                         new ReportDto
                         {
                             UserId = (int)x.UserId,
@@ -57,6 +56,6 @@ public class BlogProfile : Profile
                             Comment = x.Comment,
                             IsAccepted = x.IsAccepted
                         })));
-       
+
     }
 }

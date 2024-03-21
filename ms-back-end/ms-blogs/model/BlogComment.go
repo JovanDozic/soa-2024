@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type BlogComment struct {
@@ -15,4 +16,7 @@ type BlogComment struct {
 	TimeUpdated time.Time `json:"timeUpdated"`
 }
 
-// TODO: Before create
+func (blog *BlogComment) BeforeCreate(scope *gorm.DB) error {
+	blog.ID = uuid.New()
+	return nil
+}

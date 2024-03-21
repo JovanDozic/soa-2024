@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"log"
+	"ms-blogs/model"
 	"ms-blogs/service"
 	"net/http"
 
@@ -25,4 +26,42 @@ func (handler *BlogCommentHandler) GetByBlogId(writer http.ResponseWriter, req *
 	}
 	writer.WriteHeader(http.StatusOK)
 	json.NewEncoder(writer).Encode(comments)
+}
+
+func (handler *BlogCommentHandler) Add(writer http.ResponseWriter, req *http.Request) {
+	var comment model.BlogComment
+	err := json.NewDecoder(req.Body).Decode(&comment)
+	if err != nil {
+		println("Error while parsing json")
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err = handler.BlogCommentService.Create(&comment)
+	if err != nil {
+		println("Error while creating a new comment")
+		writer.WriteHeader(http.StatusExpectationFailed)
+		return
+	}
+	writer.WriteHeader(http.StatusCreated)
+	writer.Header().Set("Content-Type", "application/json")
+}
+
+func (handler *BlogCommentHandler) Delete(writer http.ResponseWriter, req *http.Request) {
+
+	var comment model.BlogComment
+	err := json.NewDecoder(req.Body).Decode(&comment)
+	if err != nil {
+		println("Error while parsing json")
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("Deleting comment from blog ID: %s\tcreated @ %s", comment.BlogId, comment.TimeCreated)
+
+	err = handler.BlogCommentService.Delete(comment.BlogId, comment.TimeCreated)
+	if err != nil {
+		writer.WriteHeader(http.StatusNotFound)
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
 }

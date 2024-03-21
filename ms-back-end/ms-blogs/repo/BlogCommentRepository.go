@@ -2,7 +2,9 @@ package repo
 
 import (
 	"ms-blogs/model"
+	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -44,4 +46,13 @@ func (repo *BlogCommentRepository) GetByBlogId(blogId string) ([]model.BlogComme
 		return nil, dbResult.Error
 	}
 	return blogComments, nil
+}
+
+func (repo *BlogCommentRepository) Delete(blogId uuid.UUID, commentCreateTime time.Time) error {
+	dbResult := repo.DatabaseConnection.Delete(&model.BlogComment{}, "blog_id = ? AND time_created = ?", blogId, commentCreateTime)
+	if dbResult.Error != nil {
+		return dbResult.Error
+	}
+	println("Rows affected: ", dbResult.RowsAffected)
+	return nil
 }

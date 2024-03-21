@@ -5,18 +5,18 @@ namespace Explorer.Blog.Core.Domain
     public class BlogComment : ValueObject
     {
         public int UserId { get; init; }
-        public int BlogId { get; init; }
+        public string BlogId { get; init; }
         public string Comment { get; private set; }
         public DateTime TimeCreated { get; init; }
         public DateTime TimeUpdated { get; private set; }
 
         [Newtonsoft.Json.JsonConstructor]
-        public BlogComment(int userId, int blogId, string comment, DateTime timeCreated, DateTime timeUpdated)
+        public BlogComment(int userId, string blogId, string comment, DateTime timeCreated, DateTime timeUpdated)
         {
 
             if (userId == 0) throw new ArgumentException("Invalid UserId");
             UserId = userId;
-            if (blogId == 0) throw new ArgumentException("Invalid BlogId");
+            if (string.IsNullOrEmpty(blogId)) throw new ArgumentException("Invalid BlogId");
             BlogId = blogId;
             if (string.IsNullOrWhiteSpace(comment)) throw new ArgumentException("Invalid Name.");
             Comment = comment;
