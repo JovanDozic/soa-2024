@@ -32,7 +32,7 @@ namespace Explorer.API.Controllers.Author.Tour
         [HttpGet("getAll")]
         public async Task<ActionResult<TourDto>> GetAllAsync([FromQuery] int page, [FromQuery] int pageSize)
         {
-            string uri = $"{_msToursUrl}/tours/get-all-tours";
+            string uri = $"{_msToursUrl}/get-all-tours";
             using HttpResponseMessage response = await _client.GetAsync(uri);
             if (!response.IsSuccessStatusCode)
             {
@@ -85,7 +85,7 @@ namespace Explorer.API.Controllers.Author.Tour
         [HttpPost]
         public async Task<ActionResult<TourDto>> Create([FromBody] TourDto tour)
         {
-            string uri = $"{_msToursUrl}/tours/createTour";
+            string uri = $"{_msToursUrl}/tours/create-tour";
             string tourJson = JsonConvert.SerializeObject(tour);
             HttpContent httpContent = new StringContent(tourJson, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await _client.PostAsync(uri, httpContent);
