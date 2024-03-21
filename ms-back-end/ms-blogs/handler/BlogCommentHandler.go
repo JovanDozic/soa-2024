@@ -28,7 +28,7 @@ func (handler *BlogCommentHandler) GetByBlogId(writer http.ResponseWriter, req *
 	json.NewEncoder(writer).Encode(comments)
 }
 
-func (handler *BlogCommentHandler) Add(writer http.ResponseWriter, req *http.Request) {
+func (handler *BlogCommentHandler) Create(writer http.ResponseWriter, req *http.Request) {
 	var comment model.BlogComment
 	err := json.NewDecoder(req.Body).Decode(&comment)
 	if err != nil {

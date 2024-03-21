@@ -19,15 +19,15 @@ const (
 )
 
 type Blog struct {
-	ID           uuid.UUID      `json:"id"`
-	Title        string         `json:"title"`
-	Description  string         `json:"content"`
-	Status       BlogStatus     `json:"status"`
-	CreationDate time.Time      `json:"creationDate"`
-	UserId       int64          `json:"userId"`
-	NetVotes     int            `json:"netVotes"`
-	BlogComments []*BlogComment `json:"blogComments"`
-	// BlogReports  []*BlogReport  `json:"blogReports"`
+	ID                 uuid.UUID            `json:"id"`
+	Title              string               `json:"title"`
+	Description        string               `json:"content"`
+	Status             BlogStatus           `json:"status"`
+	CreationDate       time.Time            `json:"creationDate"`
+	UserId             int64                `json:"userId"`
+	NetVotes           int                  `json:"netVotes"`
+	BlogComments       []*BlogComment       `json:"blogComments"`
+	BlogCommentReports []*BlogCommentReport `json:"reports"`
 	// Ratings      []*BlogRating  `json:"ratings"`
 	// Images       []string   `json:"images"`
 }

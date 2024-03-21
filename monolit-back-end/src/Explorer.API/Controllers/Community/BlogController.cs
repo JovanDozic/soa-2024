@@ -1,4 +1,5 @@
-﻿using Explorer.Blog.API.Dtos;
+﻿
+using Explorer.Blog.API.Dtos;
 using Explorer.Blog.API.Public;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Stakeholders.API.Public;
@@ -47,17 +48,6 @@ namespace Explorer.API.Controllers.Community
             string content = await response.Content.ReadAsStringAsync();
 
             return CreateResponse(content.ToResult());
-
-            //string uri = $"{_msBlogUrl}/blogs/{blogId}";
-            //using HttpResponseMessage response = await _client.GetAsync(uri);
-            //if (!response.IsSuccessStatusCode)
-            //{
-            //    return StatusCode((int)response.StatusCode);
-            //}
-
-            //string content = await response.Content.ReadAsStringAsync();
-            //var blog = JsonConvert.DeserializeObject<BlogDto>(content);
-            //return Ok(blog);
         }
 
         [AllowAnonymous]
@@ -167,10 +157,24 @@ namespace Explorer.API.Controllers.Community
         }
 
         [Authorize(Policy = "authorOrTouristPolicy")]
-        [HttpPost("reportBlogComment/{blogId:int}")]
-        public ActionResult<ReportDto> ReportBlogComment([FromRoute] int blogId, [FromBody] ReportDto report)
+        [HttpPost("reportBlogComment/{blogId}")] // * Updated for Go implementation
+        public async Task<ActionResult<ReportDto>> ReportBlogCommentAsync([FromRoute] string blogId, [FromBody] ReportDto report)
         {
-            return CreateResponse(_blogService.CreateReport(blogId, report));
+            string uri = $"{_msBlogUrl}/comments/reports";
+            report.BlogId = blogId;
+
+            var json = JsonConvert.SerializeObject(report);
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using HttpResponseMessage response = await _client.PostAsync(uri, data);
+            if (!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode);
+            }
+
+            string content = response.Content.ReadAsStringAsync().Result;
+            var blogComment = JsonConvert.DeserializeObject<ReportDto>(content);
+            return Ok(blogComment);
         }
 
         [Authorize(Policy = "authorOrTouristPolicy")]
@@ -228,21 +232,21 @@ namespace Explorer.API.Controllers.Community
         }
 
         [Authorize(Policy = "authorOrTouristPolicy")]
-        [HttpGet("didUserReportComment/{blogId:int}/{userId:int}/{commentTimeCreated}")]
-        public ActionResult<bool> DidUserReportComment([FromRoute] int blogId, [FromRoute] int userId, [FromRoute] DateTime commentTimeCreated)
+        [HttpPut("didUserReportComment/{blogId}/{userId:int}")] // * Updated for Go implementation
+        public async Task<ActionResult<bool>> DidUserReportCommentAsync([FromRoute] string blogId, [FromRoute] int userId, [FromBody] BlogCommentDto comment)
         {
-            var blogs = _blogService.GetPaged(1, int.MaxValue).Value.Results;
+            string uri = $"{_msBlogUrl}/comments/reports/didUserReport/{userId}/{blogId}";
+            string json = JsonConvert.SerializeObject(comment);
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
 
-            foreach (var blog in blogs)
+            using HttpResponseMessage response = await _client.PutAsync(uri, data);
+            if (!response.IsSuccessStatusCode)
             {
-                if (blog.Reports == null)
-                    return Ok(false);
-
-                if (blog.Reports.Any(report => report.ReportAuthorId == userId && report.TimeCommentCreated == commentTimeCreated))
-                    return Ok(true);
+                return StatusCode((int)response.StatusCode);
             }
 
-            return Ok(false);
+            string content = response.Content.ReadAsStringAsync().Result;
+            return Ok(bool.Parse(content));
         }
 
 

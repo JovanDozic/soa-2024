@@ -276,7 +276,6 @@ export class DetailedBlogComponent {
         this.selectedReportReason = index;
     }
 
-
     reportComment() {
         if (this.selectedReportReason > 0) {
 
