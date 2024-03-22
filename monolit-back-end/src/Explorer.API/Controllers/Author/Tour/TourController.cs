@@ -8,6 +8,7 @@ using FluentResults;
 using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace Explorer.API.Controllers.Author.Tour
         [HttpGet("getAll")]
         public async Task<ActionResult<TourDto>> GetAllAsync([FromQuery] int page, [FromQuery] int pageSize)
         {
-            string uri = $"{_msToursUrl}/tours/get-all-tours";
+            string uri = $"{_msToursUrl}/get-all-tours";
             using HttpResponseMessage response = await _client.GetAsync(uri);
             if (!response.IsSuccessStatusCode)
             {
@@ -48,9 +49,10 @@ namespace Explorer.API.Controllers.Author.Tour
         }
 
         [HttpGet("getAllPublic")]
-        public ActionResult<TourDto> GetAllPublic()
+        public ActionResult<TourDto> GetAllPublic([FromQuery] int page, [FromQuery] int pageSize)
         {
-            return CreateResponse(_tourService.GetAllPublic());
+            var response = CreateResponse(_tourService.GetPaged(page, pageSize));
+            return response;
         }
 
         

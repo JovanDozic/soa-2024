@@ -12,7 +12,6 @@ import (
 	"ms-tours/model"
 	"ms-tours/repo"
 	"ms-tours/service"
-
 )
 
 func initDB() *gorm.DB {
@@ -38,8 +37,8 @@ func initDB() *gorm.DB {
 func startServer(handler *handler.TourHandler, problemHandler *handler.ProblemHandler, reviewHandler *handler.TourReviewHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/ms-tours/tours/{id}", handler.Get).Methods("GET")
 	router.HandleFunc("/ms-tours/get-all-tours", handler.GetAll).Methods("GET")
+	router.HandleFunc("/ms-tours/tours/{id}", handler.Get).Methods("GET")
 	router.HandleFunc("/ms-tours/tours/create-tour", handler.Create).Methods("POST")
 	router.HandleFunc("/ms-tours/createProblem", problemHandler.Create).Methods("POST")
 	router.HandleFunc("/ms-tours/createReview", reviewHandler.Create).Methods("POST")
