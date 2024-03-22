@@ -23,7 +23,7 @@ func initDB() *gorm.DB {
 
 	// AutoMigrate will create the table if it does not exist and will
 	// automigrate it if there are any schema changes
-	err = database.AutoMigrate(&model.Tour{}, &model.Problem{}, &model.TourReview{})
+	err = database.AutoMigrate(&model.Tour{}, &model.Problem{}, &model.TourReview{}, &model.Club{})
 	if err != nil {
 		log.Fatalf("Failed to auto migrate database: %v", err)
 	}
@@ -34,14 +34,15 @@ func initDB() *gorm.DB {
 	return database
 }
 
-func startServer(handler *handler.TourHandler, problemHandler *handler.ProblemHandler, reviewHandler *handler.TourReviewHandler) {
+func startServer(handler *handler.TourHandler, problemHandler *handler.ProblemHandler, reviewHandler *handler.TourReviewHandler, clubHandler *handler.ClubHandler) {
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/ms-tours/get-all-tours", handler.GetAll).Methods("GET")
 	router.HandleFunc("/ms-tours/tours/{id}", handler.Get).Methods("GET")
 	router.HandleFunc("/ms-tours/tours/create-tour", handler.Create).Methods("POST")
-	router.HandleFunc("/ms-tours/createProblem", problemHandler.Create).Methods("POST")
-	router.HandleFunc("/ms-tours/createReview", reviewHandler.Create).Methods("POST")
+	router.HandleFunc("/ms-tours/create-problem", problemHandler.Create).Methods("POST")
+	router.HandleFunc("/ms-tours/create-review", reviewHandler.Create).Methods("POST")
+	router.HandleFunc("/ms-tours/create-club", clubHandler.Create).Methods("POST")
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 	log.Println("Server starting")
@@ -55,6 +56,10 @@ func main() {
 		return
 	}
 
+	clubRepo := &repo.ClubRepository{DatabaseConnection: database}
+	clubService := &service.ClubService{ClubRepository: clubRepo}
+	clubHandler := &handler.ClubHandler{ClubService: clubService}
+
 	reviewRepo := &repo.TourReviewRepository{DatabaseConnection: database}
 	reviewService := &service.TourReviewService{TourReviewRepository: reviewRepo}
 	reviewHandler := &handler.TourReviewHandler{TourReviewService: reviewService}
@@ -67,5 +72,5 @@ func main() {
 	service := &service.TourService{TourRepository: repo}
 	handler := &handler.TourHandler{TourService: service}
 
-	startServer(handler, problemHandler, reviewHandler)
+	startServer(handler, problemHandler, reviewHandler, clubHandler)
 }

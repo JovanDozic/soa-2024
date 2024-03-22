@@ -88,7 +88,7 @@ namespace Explorer.API.Controllers.Author.Tour
         [HttpPost]
         public async Task<ActionResult<TourDto>> Create([FromBody] TourDto tour)
         {
-            string uri = $"{_msToursUrl}/tours/createTour";
+            string uri = $"{_msToursUrl}/tours/create-tour";
             string tourJson = JsonConvert.SerializeObject(tour);
             HttpContent httpContent = new StringContent(tourJson, Encoding.UTF8, "application/json");
             using HttpResponseMessage response = await _client.PostAsync(uri, httpContent);
@@ -141,7 +141,7 @@ namespace Explorer.API.Controllers.Author.Tour
             try
             {
                 string payload = System.Text.Json.JsonSerializer.Serialize(tourReview);
-                string uri = $"{_msToursUrl}/createReview";
+                string uri = $"{_msToursUrl}/create-review";
 
                 var content = new StringContent(payload, Encoding.UTF8, "application/json");
 
@@ -170,7 +170,7 @@ namespace Explorer.API.Controllers.Author.Tour
             try
             {
                 string payload = System.Text.Json.JsonSerializer.Serialize(problem);
-                string uri = $"{_msToursUrl}/createProblem";
+                string uri = $"{_msToursUrl}/create-problem";
 
                 var content = new StringContent(payload, Encoding.UTF8, "application/json");
 

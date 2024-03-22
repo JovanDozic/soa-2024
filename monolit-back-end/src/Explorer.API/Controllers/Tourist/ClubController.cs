@@ -8,6 +8,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Explorer.Tours.Core.Domain.Tours;
+using FluentResults;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace Explorer.API.Controllers.Tourist
 {
@@ -16,8 +20,8 @@ namespace Explorer.API.Controllers.Tourist
     public class ClubController : BaseApiController
     {
         private readonly IClubService _clubService;
-        
-      
+        private readonly string _msToursUrl = "http://localhost:8081/ms-tours";
+        static readonly HttpClient _client = new();
 
         public ClubController(IClubService clubService)
         {
@@ -32,10 +36,20 @@ namespace Explorer.API.Controllers.Tourist
         }
 
         [HttpPost]
-        public ActionResult<ClubRegistrationDto> Create([FromBody] ClubRegistrationDto reg)
+        public async Task<ActionResult<ClubRegistrationDto>> CreateAsync([FromBody] ClubRegistrationDto club)
         {
-            var result = _clubService.Create(reg);
-            return CreateResponse(result);
+            string uri = $"{_msToursUrl}/create-club";
+            string clubJson = JsonConvert.SerializeObject(club);
+            HttpContent httpContent = new StringContent(clubJson, Encoding.UTF8, "application/json");
+            using HttpResponseMessage response = await _client.PostAsync(uri, httpContent);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode);
+            }
+
+            string content = await response.Content.ReadAsStringAsync();
+            return CreateResponse(content.ToResult());
         }
 
         [HttpPut("{id:int}")]

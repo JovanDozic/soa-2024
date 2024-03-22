@@ -29,7 +29,7 @@ namespace Explorer.Stakeholders.Tests.Integration.Tourist
             };
 
             // Act
-            var result = ((ObjectResult)controller.Create(newEntity).Result)?.Value as ClubRegistrationDto;
+            var result = ((ObjectResult)controller.CreateAsync(newEntity).Result)?.Value as ClubRegistrationDto;
 
             // Assert - Response
             result.ShouldNotBeNull();
@@ -55,7 +55,7 @@ namespace Explorer.Stakeholders.Tests.Integration.Tourist
             };
 
             // Act
-            var result = (ObjectResult)controller.Create(updatedEntity).Result;
+            var result = (ObjectResult)controller.CreateAsync(updatedEntity).Result;
 
             // Assert
             result.ShouldNotBeNull();
