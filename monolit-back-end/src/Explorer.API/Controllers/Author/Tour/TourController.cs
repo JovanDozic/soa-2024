@@ -32,7 +32,6 @@ namespace Explorer.API.Controllers.Author.Tour
         [AllowAnonymous]
         [HttpGet("getAll")]
         public async Task<ActionResult<TourDto>> GetAllAsync([FromQuery] int page, [FromQuery] int pageSize)
-        public async Task<ActionResult<TourDto>> GetAllAsync([FromQuery] int page, [FromQuery] int pageSize)
         {
             string uri = $"{_msToursUrl}/tours/get-all-tours";
             using HttpResponseMessage response = await _client.GetAsync(uri);
@@ -139,8 +138,8 @@ namespace Explorer.API.Controllers.Author.Tour
         {
             try
             {
-                string payload = JsonSerializer.Serialize(tourReview);
-                string uri = $"{_msTourUrl}/createReview";
+                string payload = System.Text.Json.JsonSerializer.Serialize(tourReview);
+                string uri = $"{_msToursUrl}/createReview";
 
                 var content = new StringContent(payload, Encoding.UTF8, "application/json");
 
