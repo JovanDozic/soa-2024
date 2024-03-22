@@ -15,21 +15,16 @@ import (
 )
 
 func initDB() *gorm.DB {
-	connectionString := "user=postgres password=super dbname=ms-tours host=localhost port=5432 sslmode=disable"
+	connectionString := "user=postgres password=super dbname=ms-tours host=localhost port=5432 sslmode=disable search_path=tours"
 	database, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	// AutoMigrate will create the table if it does not exist and will
-	// automigrate it if there are any schema changes
 	err = database.AutoMigrate(&model.Tour{}, &model.Problem{}, &model.TourReview{}, &model.Club{})
 	if err != nil {
 		log.Fatalf("Failed to auto migrate database: %v", err)
 	}
-
-	// Insert initial data
-	//database.Exec("INSERT INTO tours (id, name) VALUES ($1, $2) ON CONFLICT DO NOTHING", "aec7e123-233d-4a09-a289-75308ea5b7e6", "Prva tura")
 
 	return database
 }

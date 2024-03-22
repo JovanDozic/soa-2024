@@ -54,7 +54,6 @@ func startServer(blogHandler *handler.BlogHandler, blogCommentHandler *handler.B
 	router := mux.NewRouter().StrictSlash(true)
 
 	// /ms-blogs/
-	//"http://localhost:8080/ms-blogs/blogs/all"
 	router.HandleFunc("/ms-blogs/blogs/all", blogHandler.GetAll).Methods("GET")
 	router.HandleFunc("/ms-blogs/blogs/{id}", blogHandler.Get).Methods("GET")
 	router.HandleFunc("/ms-blogs/blogs", blogHandler.Create).Methods("POST")
