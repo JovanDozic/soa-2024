@@ -15,13 +15,13 @@ import (
 )
 
 func initDB() *gorm.DB {
-	connectionString := "user=postgres password=super dbname=ms-tours host=localhost port=5432 sslmode=disable search_path=tours"
+	connectionString := "user=postgres password=super dbname=ms-tours host=database port=5432 sslmode=disable"
 	database, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	err = database.AutoMigrate(&model.Tour{}, &model.Problem{}, &model.TourReview{}, &model.Club{})
+	err = database.AutoMigrate(&model.Tour{}, &model.Point{}, &model.TourReview{}, &model.Tag{}, &model.RequiredTime{}, &model.Problem{}, &model.TourReview{}, &model.Club{})
 	if err != nil {
 		log.Fatalf("Failed to auto migrate database: %v", err)
 	}

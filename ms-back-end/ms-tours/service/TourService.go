@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"log"
 	"ms-tours/model"
 	"ms-tours/repo"
 )
@@ -19,6 +20,7 @@ func (service *TourService) FindTour(id string) (*model.Tour, error) {
 }
 
 func (service *TourService) Create(tour *model.Tour) error {
+	log.Printf("Usao u tourService")
 	err := service.TourRepository.CreateTour(tour)
 	if err != nil {
 		return err
