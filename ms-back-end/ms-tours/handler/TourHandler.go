@@ -47,7 +47,8 @@ func (handler *TourHandler) Create(writer http.ResponseWriter, request *http.Req
 	var tour model.Tour
 	err := json.NewDecoder(request.Body).Decode(&tour)
 
-	log.Printf("%v", tour)
+	log.Printf("%s", tour)
+	log.Printf("Usao u createee")
 	if err != nil {
 		println("Error while parsing json")
 		log.Printf(err.Error())

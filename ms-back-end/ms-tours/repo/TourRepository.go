@@ -1,10 +1,11 @@
 package repo
 
 import (
+	"log"
+
 	"gorm.io/gorm"
 
 	"ms-tours/model"
-
 )
 
 type TourRepository struct {
@@ -30,6 +31,7 @@ func (repo *TourRepository) GetAll() ([]model.Tour, error) {
 }
 
 func (repo *TourRepository) CreateTour(tour *model.Tour) error {
+	log.Printf("Usao u tourRepo")
 	dbResult := repo.DatabaseConnection.Create(tour)
 	if dbResult.Error != nil {
 		return dbResult.Error

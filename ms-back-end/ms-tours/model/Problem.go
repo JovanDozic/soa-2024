@@ -1,11 +1,13 @@
 package model
 
 import (
+	"database/sql/driver"
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-
 )
 
 type Problem struct {
@@ -25,4 +27,22 @@ type Problem struct {
 func (problem *Problem) BeforeCreate(scope *gorm.DB) error {
 	problem.ID = uuid.New()
 	return nil
+}
+
+func (problem *Problem) Scan(value interface{}) error {
+	if value == nil {
+		*problem = Problem{}
+		return nil
+	}
+
+	bytes, ok := value.([]byte)
+	if !ok {
+		return fmt.Errorf("Scan source is not []byte")
+	}
+
+	return json.Unmarshal(bytes, problem)
+}
+
+func (problem Problem) Value() (driver.Value, error) {
+	return json.Marshal(problem)
 }
