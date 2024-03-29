@@ -220,7 +220,7 @@ export class DetailedBlogComponent {
     }
 
     rate(mark: number) {
-        const rating: BlogRating = { userId: 1, votingDate: new Date(), mark };
+        const rating: BlogRating = { userId: this.loggedInUserId, votingDate: new Date(), mark, blogId: this.blogId};
 
         this.service.rateBlog(this.blogId, rating).subscribe(
 

@@ -1,11 +1,11 @@
 export interface Blog {
-  id?: number;
+  id?: string;
+  userId: number;
   title: string;
   description: string;
   creationDate: Date;
   status: BlogStatus;
   images: string[];
-  userId: number;
   netVotes: number;
   ratings?: BlogRating[] | null;
   blogComments?: BlogComment[] | null;
@@ -40,6 +40,7 @@ export interface BlogRating {
   userId: number;
   votingDate: Date;
   mark: Vote;
+  blogId: string;
 }
 
 export function convertBlogStatusToString(status: BlogStatus): string {

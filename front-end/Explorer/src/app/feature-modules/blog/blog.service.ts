@@ -16,6 +16,8 @@ export class BlogService {
   constructor(private http: HttpClient, private authService: AuthService) { }
 
   addBlog(blog: Blog): Observable<Blog> {
+    blog.id = "3fb3e3e7-b865-4eb8-9d9e-faa9a62b8463";
+    
     return this.http.post<Blog>(environment.apiHost + `blog`, blog);
   }
 
@@ -28,6 +30,7 @@ export class BlogService {
   }
 
   getBlogs(): Observable<PagedResults<Blog>> { // HERE
+    console.log("front servis");
     return this.http.get<PagedResults<Blog>>(environment.apiHost + `blog/getAll`);
   }
 
@@ -40,6 +43,8 @@ export class BlogService {
   }
 
   rateBlog(blogId: string, blogRating: BlogRating): Observable<Blog> {
+    console.log(blogRating.blogId);
+    console.log(blogRating.userId);
     return this.http.post<Blog>(environment.apiHost + `blog/rate/` + blogId, blogRating);
   }
 
@@ -48,6 +53,8 @@ export class BlogService {
   }
 
   leaveBlogComment(blogId: string, blogComment: BlogComment): Observable<Blog> {
+    console.log("leave a comment");
+    console.log(blogId);
     return this.http.post<Blog>(environment.apiHost + `blog/commentBlog/` + blogId, blogComment);
   }
   
@@ -66,10 +73,12 @@ export class BlogService {
   }
 
   getReviewedReports(): Observable<BlogReport[]> {
+    console.log("U servicu sam - reviewed")
     return this.http.get<BlogReport[]>(environment.apiHost + `blog/getReviewedReports`);
   }
 
   getUnreviewedReports(): Observable<BlogReport[]> {
+    console.log("U servicu sam - unreviewed")
     return this.http.get<BlogReport[]>(environment.apiHost + `blog/getUnreviewedReports`);
   }
 

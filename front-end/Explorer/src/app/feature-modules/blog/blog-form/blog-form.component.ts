@@ -76,6 +76,7 @@ export class BlogFormComponent implements OnInit {
     };
     console.log("Blog to add: ", blog);
     blog.creationDate.toISOString();
+    console.log("ovde sam")
 
     this.service.addBlog(blog).subscribe({
         next: () => {

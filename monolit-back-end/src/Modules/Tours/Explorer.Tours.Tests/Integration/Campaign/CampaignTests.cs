@@ -72,7 +72,7 @@ public class CampaignTests : BaseToursIntegrationTest
                             TouristUsername = "traveler_jane",
                             TourDate = Convert.ToDateTime("2023-11-15T10:00:00.000Z"),
                             CreationDate = Convert.ToDateTime("2023-11-20T09:00:00.000Z"),
-                            Images = new List<string> { "review1.jpg" }
+                            //Images = new List<string> { "review1.jpg" }
                         }
                     },
                     ////Guide = new GuideDto
@@ -90,7 +90,7 @@ public class CampaignTests : BaseToursIntegrationTest
                     {
                         new ProblemDto
                         {
-                            Id = 10,
+                            //Id = 10,
                             Category = "Logistics",
                             Priority = false,
                             Description = "Delay in transportation schedule",
@@ -148,7 +148,7 @@ public class CampaignTests : BaseToursIntegrationTest
                     {
                         new TourReviewDto
                         {
-                            Images = new List<string> { "review_alpine.jpg" },
+                            //Images = new List<string> { "review_alpine.jpg" },
                             Rating = 4,
                             Comment = "Stunning views, but quite challenging. Be prepared!",
                             TourDate = Convert.ToDateTime("2023-08-05T12:00:00.000Z"),
@@ -162,7 +162,7 @@ public class CampaignTests : BaseToursIntegrationTest
                     {
                         new ProblemDto
                         {
-                            Id = 20,
+                           // Id = 20,
                             Time = Convert.ToDateTime("2023-08-02T16:45:00.000Z"),
                             TourId = 2,
                             Category = "Weather",
@@ -269,7 +269,7 @@ public class CampaignTests : BaseToursIntegrationTest
                             TouristUsername = "traveler_jane",
                             TourDate = Convert.ToDateTime("2023-11-15T10:00:00.000Z"),
                             CreationDate = Convert.ToDateTime("2023-11-20T09:00:00.000Z"),
-                            Images = new List<string> { "review1.jpg" }
+                            //Images = new List<string> { "review1.jpg" }
                         }
                     },
                     //Guide = new GuideDto
@@ -287,7 +287,7 @@ public class CampaignTests : BaseToursIntegrationTest
                     {
                         new ProblemDto
                         {
-                            Id = 1,
+                          //  Id = 1,
                             Category = "Logistics",
                             Priority = false,
                             Description = "Delay in transportation schedule",
@@ -345,7 +345,7 @@ public class CampaignTests : BaseToursIntegrationTest
                     {
                         new TourReviewDto
                         {
-                            Images = new List<string> { "review_alpine.jpg" },
+                          //  Images = new List<string> { "review_alpine.jpg" },
                             Rating = 4,
                             Comment = "Stunning views, but quite challenging. Be prepared!",
                             TourDate = Convert.ToDateTime("2023-08-05T12:00:00.000Z"),
@@ -359,7 +359,7 @@ public class CampaignTests : BaseToursIntegrationTest
                     {
                         new ProblemDto
                         {
-                            Id = 2,
+                           // Id = 2,
                             Time = Convert.ToDateTime("2023-08-02T16:45:00.000Z"),
                             TourId = 2,
                             Category = "Weather",
