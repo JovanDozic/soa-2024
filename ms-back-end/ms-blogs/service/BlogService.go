@@ -33,3 +33,11 @@ func (service *BlogService) GetAll() ([]model.Blog, error) {
 	}
 	return blogs, nil
 }
+
+func (service *BlogService) Rate(blogRating *model.BlogRating, ratings []model.BlogRating, blogId string) error {
+	err := service.BlogRepository.Rate(blogRating, ratings, blogId)
+	if err != nil {
+		return err
+	}
+	return nil
+}

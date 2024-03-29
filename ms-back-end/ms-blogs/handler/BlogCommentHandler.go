@@ -31,6 +31,7 @@ func (handler *BlogCommentHandler) GetByBlogId(writer http.ResponseWriter, req *
 func (handler *BlogCommentHandler) Create(writer http.ResponseWriter, req *http.Request) {
 	var comment model.BlogComment
 	err := json.NewDecoder(req.Body).Decode(&comment)
+	log.Printf(comment.Comment)
 	if err != nil {
 		println("Error while parsing json")
 		writer.WriteHeader(http.StatusBadRequest)
