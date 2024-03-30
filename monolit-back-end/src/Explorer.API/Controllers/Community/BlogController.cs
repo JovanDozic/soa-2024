@@ -47,28 +47,22 @@ namespace Explorer.API.Controllers.Community
             return Ok(blogPost);
 
         }
-        /*
+        
         [Authorize(Policy = "authorOrTouristPolicy")]
-        [HttpPut("deleteBlog/{blogId}")] // * Updated for Go implementation
-        public async Task<ActionResult<BlogDto>> DeleteBlog([FromRoute] string blogId, [FromBody] BlogDto blog)
+        [HttpDelete("delete/{blogId}")] // * Updated for Go implementation
+        public async Task<ActionResult<BlogDto>> DeleteBlog([FromRoute] string blogId)
         {
             string uri = $"{_msBlogUrl}/blogs/delete/{blogId}";
             
-
-            var json = JsonConvert.SerializeObject(blog);
-            var data = new StringContent(json, Encoding.UTF8, "application/json");
-
-            using HttpResponseMessage response = await _client.PutAsync(uri, data);
+            using HttpResponseMessage response = await _client.DeleteAsync(uri);
             if (!response.IsSuccessStatusCode)
             {
                 return StatusCode((int)response.StatusCode);
             }
 
-            string content = response.Content.ReadAsStringAsync().Result;
-            var blogComment = JsonConvert.DeserializeObject<BlogCommentDto>(content);
-            return Ok(blogComment);
+            return NoContent();
         }
-        */
+        
 
         [AllowAnonymous]
         [HttpGet("get/{blogId}")] // * Updated for Go implementation
@@ -124,7 +118,7 @@ namespace Explorer.API.Controllers.Community
         
         [Authorize(Policy = "administratorPolicy")]
         [HttpGet("getUnreviewedReports")]
-        public async Task<ActionResult<ReportDto>> GetUnreviewedReportsAsync()
+        public async Task<ActionResult<ReportDto>> GetUnreviewedReportsAsync([FromQuery] int page, [FromQuery] int pageSize)
         {
             string uri = $"{_msBlogUrl}/comments/reports/unreviewed";
             using HttpResponseMessage response = await _client.GetAsync(uri);
