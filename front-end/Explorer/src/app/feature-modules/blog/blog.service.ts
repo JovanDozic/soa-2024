@@ -61,6 +61,10 @@ export class BlogService {
   deleteBlogComment(blogId: string, _blogComment: BlogComment): Observable<Blog> {
     return this.http.put<Blog>(environment.apiHost + `blog/deleteBlogComment/` + blogId, _blogComment);
   }
+  deleteBlog(blogId: string): Observable<Blog> {
+    console.log("u servisu sam");
+    return this.http.delete<Blog>(environment.apiHost + 'blog/delete/'+ blogId);
+  }
 
 
   reportComment(blogId: string, report: BlogReport): Observable<Blog> {
@@ -73,12 +77,10 @@ export class BlogService {
   }
 
   getReviewedReports(): Observable<BlogReport[]> {
-    console.log("U servicu sam - reviewed")
     return this.http.get<BlogReport[]>(environment.apiHost + `blog/getReviewedReports`);
   }
 
   getUnreviewedReports(): Observable<BlogReport[]> {
-    console.log("U servicu sam - unreviewed")
     return this.http.get<BlogReport[]>(environment.apiHost + `blog/getUnreviewedReports`);
   }
 
