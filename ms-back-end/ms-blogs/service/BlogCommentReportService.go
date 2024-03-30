@@ -41,6 +41,8 @@ func (service *BlogCommentReportService) DidUserReportComment(userId string, blo
 	}
 	return didUserReport, nil
 }
+
+/*
 func (service *BlogCommentReportService) GetReviewed() ([]model.BlogCommentReport, error) {
 	reports, err := service.Repository.GetReviewed()
 	if err != nil {
@@ -55,3 +57,4 @@ func (service *BlogCommentReportService) GetUnReviewed() ([]model.BlogCommentRep
 	}
 	return reports, nil
 }
+*/

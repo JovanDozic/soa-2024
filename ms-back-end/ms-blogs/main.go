@@ -61,6 +61,7 @@ func startServer(blogHandler *handler.BlogHandler, blogCommentHandler *handler.B
 	router.HandleFunc("/ms-blogs/blogs/all", blogHandler.GetAll).Methods("GET")
 	router.HandleFunc("/ms-blogs/blogs/{id}", blogHandler.Get).Methods("GET")
 	router.HandleFunc("/ms-blogs/blogs", blogHandler.Create).Methods("POST")
+	router.HandleFunc("/ms-blogs/blogs/delete/{id}", blogHandler.Delete).Methods("DELETE")
 
 	// /ms-blogs/comments/
 	router.HandleFunc("/ms-blogs/comments/{blogId}", blogCommentHandler.GetByBlogId).Methods("GET")
@@ -73,7 +74,8 @@ func startServer(blogHandler *handler.BlogHandler, blogCommentHandler *handler.B
 
 	router.HandleFunc("/ms-blogs/comments/reports/all", blogCommentReportHandler.GetAll).Methods("GET")
 	router.HandleFunc("/ms-blogs/comments/reports/{blogId}", blogCommentReportHandler.GetByBlogId).Methods("GET")
-	router.HandleFunc("/ms-blogs/comments/reports/unreviewed", blogCommentReportHandler.GetUnReviewed).Methods("GET")
+	router.HandleFunc("/ms-blogs/comments/reports/unreviewed", blogCommentReportHandler.GetUnreviewed).Methods("GET")
+	//router.HandleFunc("/ms-blogs/comments/reports/unreviewed", blogCommentReportHandler.GetUnReviewed).Methods("GET")
 	router.HandleFunc("/ms-blogs/comments/reports", blogCommentReportHandler.Create).Methods("POST")
 	//router.HandleFunc("/ms-blogs/comments/reports/reviewed", blogCommentReportHandler.GetReviewed).Methods("GET")
 

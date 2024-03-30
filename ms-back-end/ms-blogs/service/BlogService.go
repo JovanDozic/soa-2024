@@ -2,8 +2,11 @@ package service
 
 import (
 	"fmt"
+	"log"
 	"ms-blogs/model"
 	"ms-blogs/repo"
+
+	"github.com/google/uuid"
 )
 
 type BlogService struct {
@@ -40,4 +43,18 @@ func (service *BlogService) Rate(blogRating *model.BlogRating, ratings []model.B
 		return err
 	}
 	return nil
+}
+func (service *BlogService) Delete(blogId string) error {
+	log.Printf("u servisu")
+	blogIdUUID, err1 := uuid.Parse(blogId)
+	if err1 != nil {
+		fmt.Println("Error parsing UUID:", err1)
+		return nil
+	}
+	err2 := service.BlogRepository.Delete(blogIdUUID)
+	if err2 != nil {
+		return err2
+	}
+	return nil
+
 }

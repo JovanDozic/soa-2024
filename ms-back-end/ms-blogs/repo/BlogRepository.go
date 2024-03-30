@@ -105,7 +105,13 @@ func (repo *BlogRepository) Rate(blogRating *model.BlogRating, ratings []model.B
 }
 
 func (repo *BlogRepository) Delete(blogId uuid.UUID) error {
-	dbResult := repo.DatabaseConnection.Delete(&model.Blog{}, "blog_id = ? ", blogId)
+
+	dbResult1 := repo.DatabaseConnection.Delete(&model.BlogComment{}, "blog_id = ? ", blogId)
+	if dbResult1.Error != nil {
+		return dbResult1.Error
+	}
+
+	dbResult := repo.DatabaseConnection.Delete(&model.Blog{}, "id = ? ", blogId)
 	if dbResult.Error != nil {
 		return dbResult.Error
 	}

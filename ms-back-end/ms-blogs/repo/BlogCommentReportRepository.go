@@ -1,7 +1,6 @@
 package repo
 
 import (
-	"log"
 	"ms-blogs/model"
 	"time"
 
@@ -29,22 +28,25 @@ func (repo *BlogCommentReportRepository) GetAll() ([]model.BlogCommentReport, er
 	}
 	return blogCommentReports, nil
 }
+
+/*
 func (repo *BlogCommentReportRepository) GetReviewed() ([]model.BlogCommentReport, error) {
-	log.Printf("u repo sam")
-	allReports, err := repo.GetAll()
-	if err != nil {
-		return nil, err
-	}
-	var filteredReports []model.BlogCommentReport
 
-	for _, report := range allReports {
-		if report.IsReviewed {
-			filteredReports = append(filteredReports, report)
+		log.Printf("u repo sam")
+		allReports, err := repo.GetAll()
+		if err != nil {
+			return nil, err
 		}
-	}
-	return filteredReports, nil
+		var filteredReports []model.BlogCommentReport
 
-}
+		for _, report := range allReports {
+			if report.IsReviewed {
+				filteredReports = append(filteredReports, report)
+			}
+		}
+		return filteredReports, nil
+
+}*/
 
 func (repo *BlogCommentReportRepository) GetUnReviewed() ([]model.BlogCommentReport, error) {
 	allReports, err := repo.GetAll()

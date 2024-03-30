@@ -100,3 +100,14 @@ func (handler *BlogHandler) Rate(writer http.ResponseWriter, req *http.Request) 
 	writer.Header().Set("Content-Type", "application/json")
 
 }
+func (handler *BlogHandler) Delete(writer http.ResponseWriter, req *http.Request) {
+	log.Printf("usao u handler")
+	vars := mux.Vars(req)
+	blogId := vars["id"]
+	err := handler.BlogService.Delete(blogId)
+	if err != nil {
+		writer.WriteHeader(http.StatusNotFound)
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+}

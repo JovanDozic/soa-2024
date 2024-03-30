@@ -42,7 +42,10 @@ func (handler *BlogCommentReportHandler) GetAll(writer http.ResponseWriter, req 
 	writer.WriteHeader(http.StatusOK)
 	json.NewEncoder(writer).Encode(reports)
 }
+
+/*
 func (handler *BlogCommentReportHandler) GetReviewed(writer http.ResponseWriter, req *http.Request) {
+
 	log.Printf("u handleru")
 	reports, err := handler.BlogCommentReportService.GetReviewed()
 	writer.Header().Set("Content-Type", "application/json")
@@ -52,17 +55,11 @@ func (handler *BlogCommentReportHandler) GetReviewed(writer http.ResponseWriter,
 	}
 	writer.WriteHeader(http.StatusOK)
 	json.NewEncoder(writer).Encode(reports)
+
 }
-func (handler *BlogCommentReportHandler) GetUnReviewed(writer http.ResponseWriter, req *http.Request) {
-	println("U blog comment handleru sam - dobavljanje reportova")
-	reports, err := handler.BlogCommentReportService.GetUnReviewed()
-	writer.Header().Set("Content-Type", "application/json")
-	if err != nil {
-		writer.WriteHeader(http.StatusNotFound)
-		return
-	}
-	writer.WriteHeader(http.StatusOK)
-	json.NewEncoder(writer).Encode(reports)
+*/
+func (handler *BlogCommentReportHandler) GetUnreviewed(writer http.ResponseWriter, req *http.Request) {
+	log.Printf("usao sam u blog comment report handler - dobavljanje unreviewed")
 }
 
 func (handler *BlogCommentReportHandler) GetByBlogId(writer http.ResponseWriter, req *http.Request) {
