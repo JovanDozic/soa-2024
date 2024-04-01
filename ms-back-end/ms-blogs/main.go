@@ -85,7 +85,7 @@ func startServer(blogHandler *handler.BlogHandler, blogCommentHandler *handler.B
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 	println("Server starting")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe("127.0.0.1	:8080", router))
 	log.Printf("ponovo u mainu")
 }
 
