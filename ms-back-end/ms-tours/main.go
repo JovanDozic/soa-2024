@@ -15,7 +15,7 @@ import (
 )
 
 func initDB() *gorm.DB {
-	connectionString := "user=postgres password=super dbname=ms-tours host=localhost port=5432 sslmode=disable search_path=tours"
+	connectionString := "user=postgres password=super dbname=ms-tours host=ms-tours-database port=5432 sslmode=disable"
 	database, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
@@ -41,7 +41,7 @@ func startServer(handler *handler.TourHandler, problemHandler *handler.ProblemHa
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 	log.Println("Server starting")
-	log.Fatal(http.ListenAndServe("127.0.0.1:8081", router))
+	log.Fatal(http.ListenAndServe(":8081", router))
 }
 
 func main() {

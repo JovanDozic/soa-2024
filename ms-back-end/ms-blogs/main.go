@@ -14,7 +14,7 @@ import (
 )
 
 func initDB() *gorm.DB {
-	connectionString := "user=postgres password=super dbname=ms-blogs host=localhost port=5432 sslmode=disable search_path=blogs"
+	connectionString := "user=postgres password=super dbname=ms-blogs host=ms-blogs-database port=5432 sslmode=disable"
 	database, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
 	if err != nil {
 		print(err)
@@ -85,7 +85,7 @@ func startServer(blogHandler *handler.BlogHandler, blogCommentHandler *handler.B
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 	println("Server starting")
-	log.Fatal(http.ListenAndServe("127.0.0.1	:8080", router))
+	log.Fatal(http.ListenAndServe(":8080", router))
 	log.Printf("ponovo u mainu")
 }
 
