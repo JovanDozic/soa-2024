@@ -1,6 +1,7 @@
 ﻿
 using Explorer.Blog.API.Dtos;
 using Explorer.Blog.API.Public;
+using Explorer.Blog.Core.Converters;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Stakeholders.API.Public;
 using FluentResults;
@@ -26,13 +27,42 @@ namespace Explorer.API.Controllers.Community
             _userService = userService;
         }
 
+
         [Authorize(Policy = "authorOrTouristPolicy")]
         [HttpPost]
-        public ActionResult<BlogDto> Create([FromBody] BlogDto blog)
+        public async Task<ActionResult<BlogDto>> Create([FromBody] BlogDto blog)
         {
-            var result = _blogService.Create(blog);
-            return CreateResponse(result);
+            string uri = $"{_msBlogUrl}/blogs";
+            var json = JsonConvert.SerializeObject(blog);
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using HttpResponseMessage response = await _client.PostAsync(uri, data);
+            if (!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode);
+            }
+
+            string content = await response.Content.ReadAsStringAsync();
+            var blogPost = JsonConvert.DeserializeObject<BlogDto>(content);
+            return Ok(blogPost);
+
         }
+        
+        [Authorize(Policy = "authorOrTouristPolicy")]
+        [HttpDelete("delete/{blogId}")] // * Updated for Go implementation
+        public async Task<ActionResult<BlogDto>> DeleteBlog([FromRoute] string blogId)
+        {
+            string uri = $"{_msBlogUrl}/blogs/delete/{blogId}";
+            
+            using HttpResponseMessage response = await _client.DeleteAsync(uri);
+            if (!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode);
+            }
+
+            return NoContent();
+        }
+        
 
         [AllowAnonymous]
         [HttpGet("get/{blogId}")] // * Updated for Go implementation
@@ -67,37 +97,41 @@ namespace Explorer.API.Controllers.Community
 
             return Ok(pagedResult);
         }
-
+        /*
         [Authorize(Policy = "administratorPolicy")]
         [HttpGet("getReviewedReports")]
-        public ActionResult<ReportDto> GetReviewedReports()
+        public async Task<ActionResult<ReportDto>> GetReviewedReportsAsync()
         {
-            var pagedResults = _blogService.GetPaged(1, int.MaxValue).Value.Results;
-            var reviewedReports = new List<ReportDto>();
-
-            foreach (var result in pagedResults)
+            string uri = $"{_msBlogUrl}/comments/reports/reviewed";
+            using HttpResponseMessage response = await _client.GetAsync(uri);
+            if (!response.IsSuccessStatusCode)
             {
-                var reviewed = result.Reports.FindAll(report => report.IsReviewed);
-                reviewedReports.AddRange(reviewed);
+                return StatusCode((int)response.StatusCode);
             }
 
-            return Ok(reviewedReports);
-        }
+            string content = await response.Content.ReadAsStringAsync();
+            var blogs = JsonConvert.DeserializeObject<List<BlogDto>>(content);
+            var pagedResult = new PagedResult<BlogDto>(blogs, blogs.Count);
 
+            return Ok(pagedResult);
+        }*/
+        
         [Authorize(Policy = "administratorPolicy")]
         [HttpGet("getUnreviewedReports")]
-        public ActionResult<ReportDto> GetUnreviewedReports()
+        public async Task<ActionResult<ReportDto>> GetUnreviewedReportsAsync([FromQuery] int page, [FromQuery] int pageSize)
         {
-            var pagedResults = _blogService.GetPaged(1, int.MaxValue).Value.Results;
-            var reviewedReports = new List<ReportDto>();
-
-            foreach (var result in pagedResults)
+            string uri = $"{_msBlogUrl}/comments/reports/unreviewed";
+            using HttpResponseMessage response = await _client.GetAsync(uri);
+            if (!response.IsSuccessStatusCode)
             {
-                var reviewed = result.Reports.FindAll(report => !report.IsReviewed);
-                reviewedReports.AddRange(reviewed);
+                return StatusCode((int)response.StatusCode);
             }
 
-            return Ok(reviewedReports);
+            string content = await response.Content.ReadAsStringAsync();
+            var reports = JsonConvert.DeserializeObject<List<ReportDto>>(content);
+            var pagedResult = new PagedResult<ReportDto>(reports, reports.Count);
+
+            return Ok(pagedResult);
         }
 
         [AllowAnonymous]
@@ -122,10 +156,23 @@ namespace Explorer.API.Controllers.Community
         }
 
         [AllowAnonymous]
-        [HttpPost("rate/{blogId:int}")]
-        public ActionResult<BlogRatingDto> Rate([FromRoute] int blogId, [FromBody] BlogRatingDto rating)
+        [HttpPost("rate/{blogId}")]
+        public async Task<ActionResult<BlogRatingDto>> RateAsync([FromRoute] string blogId, [FromBody] BlogRatingDto rating)
         {
-            return CreateResponse(_blogService.RateBlog(blogId, rating));
+            string uri = $"{_msBlogUrl}/ratings/add/{blogId}";
+
+            var json = JsonConvert.SerializeObject(rating);
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using HttpResponseMessage response = await _client.PostAsync(uri, data);
+            if (!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode);
+            }
+            string content = await response.Content.ReadAsStringAsync();
+            var blogRating = JsonConvert.DeserializeObject<BlogRatingDto>(content);
+            return Ok(blogRating);
+
         }
 
         [Authorize(Policy = "authorOrTouristPolicy")]

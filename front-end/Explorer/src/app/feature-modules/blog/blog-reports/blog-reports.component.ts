@@ -4,6 +4,8 @@ import { BlogReport } from '../../blog/model/blog.model';
 import { BlogService } from '../blog.service';
 import { AdministrationService } from '../../administration/administration.service';
 import { UserInfo } from 'src/app/infrastructure/auth/model/user.model';
+import { PagedResults } from 'src/app/shared/model/paged-results.model';
+
 
 @Component({
   selector: 'xp-blog-reports',
@@ -29,7 +31,6 @@ export class BlogReportsComponent implements OnInit {
 
   ngOnInit(): void {
     this.getReports();
-
     this.administrationService.getAllUsers().subscribe(users => {
       this.users = users;
       if (this.unreviewedReports != null) {
@@ -56,14 +57,35 @@ export class BlogReportsComponent implements OnInit {
 
   getReports() {
     console.log("Fetching reports...");
-    this.blogService.getUnreviewedReports().subscribe(reports => {
-      this.unreviewedReports = reports;
-      console.log(reports.length + " unreviewed reports fetched.")
-    });
-    this.blogService.getReviewedReports().subscribe(reports => {
-      this.reviewedReports = reports;
-      console.log(reports.length + " reviewed reports fetched.")
-    });
+    this.blogService.getUnreviewedReports().subscribe({
+       next: (result: any) => {
+        if (result == null ) {
+          this.unreviewedReports = [];
+        } else {
+          this.unreviewedReports.push(result);
+        }
+    },
+    error: () => {
+      console.log('Error! Could not get Blogs!');
+    }
+    
+      
+    });/*
+    this.blogService.getReviewedReports().subscribe({
+      next: (result: any) => {
+        if (result == null ) {
+          this.reviewedReports = [];
+        } else {
+          this.reviewedReports.push(result);
+        }
+       
+   },
+   error: () => {
+     console.log('Error! Could not get Blogs!');
+   }
+   
+     
+   });*/
   }
 
   selectReport(report: BlogReport) {

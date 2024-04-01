@@ -13,6 +13,7 @@ import (
 type BlogHandler struct {
 	BlogService        *service.BlogService
 	BlogCommentService *service.BlogCommentService
+	BlogRatingService  *service.BlogRatingService
 }
 
 func (handler *BlogHandler) Get(writer http.ResponseWriter, req *http.Request) {
@@ -34,6 +35,9 @@ func (handler *BlogHandler) Get(writer http.ResponseWriter, req *http.Request) {
 	}
 
 	blog.BlogComments = commentPointers
+	//var ratingPointers []*model.BlogRating
+	//blog.Ratings = ratingPointers
+	//ratings, _ := handler.BlogRatingService.GetByBlogId(blogId)
 
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
@@ -41,8 +45,10 @@ func (handler *BlogHandler) Get(writer http.ResponseWriter, req *http.Request) {
 }
 
 func (handler *BlogHandler) Create(writer http.ResponseWriter, req *http.Request) {
+	log.Printf("u blog handleru sam - kreiranje bloga")
 	var blog model.Blog
 	err := json.NewDecoder(req.Body).Decode(&blog)
+	log.Printf(blog.Title)
 	if err != nil {
 		println("Error while parsing json")
 		writer.WriteHeader(http.StatusBadRequest)
@@ -68,4 +74,40 @@ func (handler *BlogHandler) GetAll(writer http.ResponseWriter, req *http.Request
 	}
 	writer.WriteHeader(http.StatusOK)
 	json.NewEncoder(writer).Encode(blogs)
+}
+
+func (handler *BlogHandler) Rate(writer http.ResponseWriter, req *http.Request) {
+	blogId := mux.Vars(req)["blogId"]
+	log.Printf("Rate-ujem blog sa id-jem : %s", blogId)
+
+	ratings, _ := handler.BlogRatingService.GetAll()
+
+	var rating model.BlogRating
+	err := json.NewDecoder(req.Body).Decode(&rating)
+	if err != nil {
+		println("Error while parsing json")
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	err = handler.BlogService.Rate(&rating, ratings, blogId)
+	if err != nil {
+		println("Error while creating a new rating")
+		writer.WriteHeader(http.StatusExpectationFailed)
+		return
+	}
+	writer.WriteHeader(http.StatusCreated)
+	writer.Header().Set("Content-Type", "application/json")
+
+}
+func (handler *BlogHandler) Delete(writer http.ResponseWriter, req *http.Request) {
+	log.Printf("usao u handler")
+	vars := mux.Vars(req)
+	blogId := vars["id"]
+	err := handler.BlogService.Delete(blogId)
+	if err != nil {
+		writer.WriteHeader(http.StatusNotFound)
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
 }

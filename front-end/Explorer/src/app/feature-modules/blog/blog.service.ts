@@ -16,6 +16,8 @@ export class BlogService {
   constructor(private http: HttpClient, private authService: AuthService) { }
 
   addBlog(blog: Blog): Observable<Blog> {
+    blog.id = "3fb3e3e7-b865-4eb8-9d9e-faa9a62b8463";
+    
     return this.http.post<Blog>(environment.apiHost + `blog`, blog);
   }
 
@@ -28,6 +30,7 @@ export class BlogService {
   }
 
   getBlogs(): Observable<PagedResults<Blog>> { // HERE
+    console.log("front servis");
     return this.http.get<PagedResults<Blog>>(environment.apiHost + `blog/getAll`);
   }
 
@@ -40,6 +43,8 @@ export class BlogService {
   }
 
   rateBlog(blogId: string, blogRating: BlogRating): Observable<Blog> {
+    console.log(blogRating.blogId);
+    console.log(blogRating.userId);
     return this.http.post<Blog>(environment.apiHost + `blog/rate/` + blogId, blogRating);
   }
 
@@ -48,11 +53,17 @@ export class BlogService {
   }
 
   leaveBlogComment(blogId: string, blogComment: BlogComment): Observable<Blog> {
+    console.log("leave a comment");
+    console.log(blogId);
     return this.http.post<Blog>(environment.apiHost + `blog/commentBlog/` + blogId, blogComment);
   }
   
   deleteBlogComment(blogId: string, _blogComment: BlogComment): Observable<Blog> {
     return this.http.put<Blog>(environment.apiHost + `blog/deleteBlogComment/` + blogId, _blogComment);
+  }
+  deleteBlog(blogId: string): Observable<Blog> {
+    console.log("u servisu sam");
+    return this.http.delete<Blog>(environment.apiHost + 'blog/delete/'+ blogId);
   }
 
 

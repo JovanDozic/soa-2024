@@ -7,7 +7,7 @@ import { Blog } from '../model/blog.model';
 import { BlogRating } from '../model/blog.model';
 import { BlogStatus, convertBlogStatusToString } from '../model/blog.model';
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AdministrationService } from '../../administration/administration.service';
 
 @Component({
@@ -36,7 +36,7 @@ export class DetailedBlogComponent {
     selectedReportReason: number = 0;
     users: UserInfo[] = [];
 
-    constructor(private service: BlogService, private authService: AuthService, private route: ActivatedRoute, private fb: FormBuilder, private el: ElementRef, private administrationService: AdministrationService) {
+    constructor(private service: BlogService, private authService: AuthService, private route: ActivatedRoute, private fb: FormBuilder, private el: ElementRef, private administrationService: AdministrationService, private router: Router) {
         this.commentForm = this.fb.group({
             comment: ['', Validators.required],
         });
@@ -220,7 +220,7 @@ export class DetailedBlogComponent {
     }
 
     rate(mark: number) {
-        const rating: BlogRating = { userId: 1, votingDate: new Date(), mark };
+        const rating: BlogRating = { userId: this.loggedInUserId, votingDate: new Date(), mark, blogId: this.blogId};
 
         this.service.rateBlog(this.blogId, rating).subscribe(
 
@@ -307,5 +307,17 @@ export class DetailedBlogComponent {
             );
         }
     }
+    deleteBlog() {
+        console.log("u ts fajlu sam");
+        this.service.deleteBlog(this.blogId).subscribe({
+            next: (_) => {
+                this.router.navigate(['/all-blogs']);
+            }
+        })
+    }
+
+    showDeleteButton(commentuserId:number):boolean {
+        return commentuserId == this.loggedInUserId;
+      }
 
 }

@@ -15,7 +15,6 @@ using Explorer.Tours.Infrastructure.Database.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-
 namespace Explorer.Payments.Infrastructure;
 
 public static class PaymentsStartup

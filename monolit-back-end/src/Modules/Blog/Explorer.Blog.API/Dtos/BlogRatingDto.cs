@@ -12,5 +12,6 @@ namespace Explorer.Blog.API.Dtos
         public int UserId { get; set; }
         public DateTime VotingDate { get; set; }
         public Vote Mark { get; set; }
+        public string BlogId { get; set; }
     }
 }

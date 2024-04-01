@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"ms-blogs/model"
 	"ms-blogs/service"
 	"net/http"
@@ -40,6 +41,25 @@ func (handler *BlogCommentReportHandler) GetAll(writer http.ResponseWriter, req 
 	}
 	writer.WriteHeader(http.StatusOK)
 	json.NewEncoder(writer).Encode(reports)
+}
+
+/*
+func (handler *BlogCommentReportHandler) GetReviewed(writer http.ResponseWriter, req *http.Request) {
+
+	log.Printf("u handleru")
+	reports, err := handler.BlogCommentReportService.GetReviewed()
+	writer.Header().Set("Content-Type", "application/json")
+	if err != nil {
+		writer.WriteHeader(http.StatusNotFound)
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(writer).Encode(reports)
+
+}
+*/
+func (handler *BlogCommentReportHandler) GetUnreviewed(writer http.ResponseWriter, req *http.Request) {
+	log.Printf("usao sam u blog comment report handler - dobavljanje unreviewed")
 }
 
 func (handler *BlogCommentReportHandler) GetByBlogId(writer http.ResponseWriter, req *http.Request) {
