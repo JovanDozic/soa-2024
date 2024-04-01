@@ -1,19 +1,9 @@
 version: '3.9'
 
+# docker compose up --build
+
 services:
-  # monolite:
-  #   build:
-  #     dockerfile: Dockerfile
-  #     context: ./monolit-back-end
-  #   image: monolit:improved
-  #   container_name: monolit-container
-  #   restart: always
-  #   networks:
-  #     - servers
-  #   ports:
-  #     - "44333:44333"
-  #   depends_on:
-  #     - database
+
   ms-tours:
     build:
       dockerfile: Dockerfile
@@ -26,9 +16,23 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - database
+      - ms-tours-database
 
-  database:
+  ms-blogs:
+    build:
+      dockerfile: Dockerfile
+      context: ./ms-back-end/ms-blogs
+    image: microservice-blogs:improve7
+    container_name: ms-blogs-container
+    restart: always
+    networks:
+      - servers
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ms-blogs-database
+
+  ms-tours-database:
     image: postgres:13
     restart: always
     networks:
@@ -39,13 +43,44 @@ services:
       POSTGRES_DB: ms-tours
       PGSEARCHPATH: tours
     volumes:
-      - database-data:/var/lib/postgresql/data
+      - ms-tours-database-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
+  ms-blogs-database:
+    image: postgres:13
+    restart: always
+    networks:
+      - servers
+    environment:
+      POSTGRES_PASSWORD: super
+      POSTGRES_USER: postgres
+      POSTGRES_DB: ms-blogs
+      PGSEARCHPATH: blogs
+    volumes:
+      - ms-blogs-database-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  # Probao sam nesto al ne radi (ocekivano)
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: pege-admin
+  #   restart: always
+  #   networks:
+  #     - servers
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: dezic
+  #     PGADMIN_DEFAULT_PASSWORD: dezic
+  #   ports:
+  #     - "82:80"
+
 volumes:
-  database-data:
+  ms-tours-database-data:
     name: ms-tours-database-data
+
+  ms-blogs-database-data:
+    name: ms-blogs-database-data
 
 networks:
   servers:
