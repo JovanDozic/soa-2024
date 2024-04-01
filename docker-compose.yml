@@ -1,5 +1,7 @@
 version: '3.9'
 
+# docker compose up --build
+
 services:
 
   ms-tours:
@@ -59,6 +61,19 @@ services:
       - ms-blogs-database-data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
+
+  # Probao sam nesto al ne radi (ocekivano)
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: pege-admin
+  #   restart: always
+  #   networks:
+  #     - servers
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: dezic
+  #     PGADMIN_DEFAULT_PASSWORD: dezic
+  #   ports:
+  #     - "82:80"
 
 volumes:
   ms-tours-database-data:
