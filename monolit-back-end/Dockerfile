@@ -19,7 +19,7 @@ WORKDIR /app/publish
 CMD ["dotnet", "Explorer.API.dll"]
 
 FROM build AS migrate
-WORKDIR /src/src
+WORKDIR /src
 ENV PATH="$PATH:/root/.dotnet/tools"
 RUN dotnet tool install --global dotnet-ef --version 7.*
 

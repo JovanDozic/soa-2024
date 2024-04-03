@@ -62,6 +62,35 @@ services:
     ports:
       - "5433:5432"
 
+  monolith-database:
+    image: postgres:13
+    restart: always
+    networks:
+      - servers
+    environment:
+      POSTGRES_PASSWORD: super
+      POSTGRES_USER: postgres
+      POSTGRES_DB: Explorer-v1
+      PGSEARCHPATH: monolith
+    volumes:
+      - ms-monolith-database-data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+
+  ms-monolith:
+    build:
+      dockerfile: Dockerfile
+      context: ./monolit-back-end
+    image: monolith-back-end:latest
+    container_name: ms-monolith-container
+    restart: always
+    networks:
+      - servers
+    ports:
+      - "8082:8082" 
+    depends_on:
+      - monolith-database
+
   # Probao sam nesto al ne radi (ocekivano)
   # pgadmin:
   #   image: dpage/pgadmin4
@@ -81,6 +110,9 @@ volumes:
 
   ms-blogs-database-data:
     name: ms-blogs-database-data
+
+  ms-monolith-database-data:
+    name: ms-monolith-database-data
 
 networks:
   servers:
