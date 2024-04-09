@@ -134,14 +134,14 @@ namespace Explorer.API.Controllers.Author.Tour
         }
 
         [HttpPost("rateTour/{tourId:int}")]
-        [Authorize(Policy = "TouristPolicy")]
+        //[Authorize(Policy = "TouristPolicy")]
 
         public async Task<ActionResult<TourReviewDto>> RateTour([FromRoute] int tourId, [FromBody] TourReviewDto tourReview)
         {
             try
             {
                 string payload = System.Text.Json.JsonSerializer.Serialize(tourReview);
-                string uri = $"{_msToursUrl}/create-review";
+                string uri = $"{_msToursUrl}/create-review/{tourId}";
 
                 var content = new StringContent(payload, Encoding.UTF8, "application/json");
 

@@ -1,6 +1,181 @@
 package handler
 
 import (
+	"context"
+	"fmt"
+	"log"
+	"ms-tours/model"
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
+
+type KeyProduct struct{}
+
+type TourHandler struct {
+	logger *log.Logger
+	// NoSQL: injecting product repository
+	repo *model.TourRepository
+}
+
+// Injecting the logger makes this code much more testable.
+func NewToursHandler(l *log.Logger, r *model.TourRepository) *TourHandler {
+	return &TourHandler{l, r}
+}
+
+func (p *TourHandler) GetAllTours(rw http.ResponseWriter, h *http.Request) {
+	tours, err := p.repo.GetAll()
+	if err != nil {
+		p.logger.Print("Database exception: ", err)
+	}
+
+	if tours == nil {
+		return
+	}
+
+	err = tours.ToJSON(rw)
+	if err != nil {
+		http.Error(rw, "Unable to convert to json", http.StatusInternalServerError)
+		p.logger.Fatal("Unable to convert to json :", err)
+		return
+	}
+}
+
+func (p *TourHandler) GetTourById(rw http.ResponseWriter, h *http.Request) {
+	vars := mux.Vars(h)
+	id := vars["id"]
+
+	tours, err := p.repo.GetById(id)
+	if err != nil {
+		p.logger.Print("Database exception: ", err)
+	}
+
+	if tours == nil {
+		http.Error(rw, "Tour with given id not found", http.StatusNotFound)
+		p.logger.Printf("Tour with id: '%s' not found", id)
+		return
+	}
+
+	err = tours.ToJSON(rw)
+	if err != nil {
+		http.Error(rw, "Unable to convert to json", http.StatusInternalServerError)
+		p.logger.Fatal("Unable to convert to json :", err)
+		return
+	}
+}
+
+func (p *TourHandler) PostTour(rw http.ResponseWriter, h *http.Request) {
+	tour := h.Context().Value(KeyProduct{}).(*model.Tour)
+	p.repo.Insert(tour)
+	rw.WriteHeader(http.StatusCreated)
+}
+
+func (p *TourHandler) AddProblem(rw http.ResponseWriter, h *http.Request) {
+	vars := mux.Vars(h)
+	id := vars["id"]
+	fmt.Printf("usao u add problem")
+
+	problem := h.Context().Value(KeyProduct{}).(*model.Problem)
+
+	p.repo.AddProblem(id, problem)
+	rw.WriteHeader(http.StatusOK)
+}
+
+func (p *TourHandler) AddReview(rw http.ResponseWriter, h *http.Request) {
+	vars := mux.Vars(h)
+	id := vars["id"]
+	fmt.Printf("id: %s", id)
+	review := h.Context().Value(KeyProduct{}).(*model.TourReview)
+
+	p.repo.AddReview(id, review)
+	rw.WriteHeader(http.StatusOK)
+}
+
+func (p *TourHandler) PostClub(rw http.ResponseWriter, h *http.Request) {
+	club := h.Context().Value(KeyProduct{}).(*model.Club)
+	p.repo.InsertClub(club)
+	rw.WriteHeader(http.StatusCreated)
+}
+
+func (p *TourHandler) MiddlewareContentTypeSet(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, h *http.Request) {
+		p.logger.Println("Method [", h.Method, "] - Hit path :", h.URL.Path)
+
+		rw.Header().Add("Content-Type", "application/json")
+
+		next.ServeHTTP(rw, h)
+	})
+}
+
+func (p *TourHandler) MiddlewareTourDeserialization(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, h *http.Request) {
+		tour := &model.Tour{}
+		err := tour.FromJSON(h.Body)
+		if err != nil {
+			http.Error(rw, "Unable to decode json", http.StatusBadRequest)
+			p.logger.Fatal(err)
+			return
+		}
+
+		ctx := context.WithValue(h.Context(), KeyProduct{}, tour)
+		h = h.WithContext(ctx)
+
+		next.ServeHTTP(rw, h)
+	})
+}
+
+func (p *TourHandler) MiddlewareClubDeserialization(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, h *http.Request) {
+		club := &model.Club{}
+		err := club.FromJSON(h.Body)
+		if err != nil {
+			http.Error(rw, "Unable to decode json", http.StatusBadRequest)
+			p.logger.Fatal(err)
+			return
+		}
+
+		ctx := context.WithValue(h.Context(), KeyProduct{}, club)
+		h = h.WithContext(ctx)
+
+		next.ServeHTTP(rw, h)
+	})
+}
+
+func (p *TourHandler) MiddlewareProblemDeserialization(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, h *http.Request) {
+		problem := &model.Problem{}
+		err := problem.FromJSON(h.Body)
+		if err != nil {
+			http.Error(rw, "Unable to decode json", http.StatusBadRequest)
+			p.logger.Fatal(err)
+			return
+		}
+
+		ctx := context.WithValue(h.Context(), KeyProduct{}, problem)
+		h = h.WithContext(ctx)
+
+		next.ServeHTTP(rw, h)
+	})
+}
+
+func (p *TourHandler) MiddlewareTourReviewDeserialization(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, h *http.Request) {
+		review := &model.TourReview{}
+		err := review.FromJSON(h.Body)
+		if err != nil {
+			http.Error(rw, "Unable to decode json", http.StatusBadRequest)
+			p.logger.Fatal(err)
+			return
+		}
+
+		ctx := context.WithValue(h.Context(), KeyProduct{}, review)
+		h = h.WithContext(ctx)
+
+		next.ServeHTTP(rw, h)
+	})
+}
+
+/*import (
 	"encoding/json"
 	"log"
 	"net/http"
@@ -63,4 +238,4 @@ func (handler *TourHandler) Create(writer http.ResponseWriter, request *http.Req
 	}
 	writer.WriteHeader(http.StatusCreated)
 	writer.Header().Set("Content-Type", "application/json")
-}
+}*/
