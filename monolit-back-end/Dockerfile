@@ -1,43 +1,24 @@
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 as base
-WORKDIR /app
-
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
+
 COPY . .
-WORKDIR /src/src
-RUN dotnet restore Explorer.API/Explorer.API.csproj
-RUN dotnet build Explorer.API/Explorer.API.csproj -c Release
 
-FROM build as publish
-RUN dotnet publish Explorer.API/Explorer.API.csproj -c Release -o /app/publish
+RUN dotnet restore src/Explorer.API/Explorer.API.csproj
+RUN dotnet build src/Explorer.API/Explorer.API.csproj -c Release -o /app/build
 
-ENV ASPNETCORE_URLS=http://+:80
+FROM build AS publish
+RUN dotnet publish src/Explorer.API/Explorer.API.csproj -c Release -o /app/publish
 
-FROM base AS final
-COPY --from=publish /app .
-WORKDIR /app/publish
-CMD ["dotnet", "Explorer.API.dll"]
-
-FROM build AS migrate
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS migrate
 WORKDIR /src
 ENV PATH="$PATH:/root/.dotnet/tools"
+
 RUN dotnet tool install --global dotnet-ef --version 7.*
 
-# RUN dotnet-ef migrations add InitialMigrationBlog --context BlogContext
-# RUN dotnet-ef migrations add InitialMigrationEncounters --context EncountersContext
-# RUN dotnet-ef migrations add InitialMigrationStakeholders --context StakeholdersContext
-# RUN dotnet-ef migrations add InitialMigrationTours --context ToursContext
-# RUN dotnet-ef migrations add InitialMigrationPayments --context PaymentsContext
+COPY . .
+COPY create_user_table.sql /app
 
-# RUN dotnet-ef database update --context BlogContext
-# RUN dotnet-ef database update --context EncountersContext
-# RUN dotnet-ef database update --context StakeholdersContext
-# RUN dotnet-ef database update --context ToursContext
-# RUN dotnet-ef database update --context PaymentsContext
-
-CMD PATH="$PATH:/root/.dotnet/tools" \
-    \
-    dotnet-ef migrations add "${MIGRATION}-stakeholders" \
+CMD dotnet-ef migrations add "${MIGRATION}-stakeholders" \
         -s "${STARTUP_PROJECT}/${STARTUP_PROJECT}.csproj" \
         -p "Modules/Stakeholders/${STAKEHOLDERS_TARGET_PROJECT}/${STAKEHOLDERS_TARGET_PROJECT}.csproj" \
         -c "StakeholdersContext" \
@@ -91,3 +72,14 @@ CMD PATH="$PATH:/root/.dotnet/tools" \
         -p "Modules/Payments/${PAYMENTS_TARGET_PROJECT}/${PAYMENTS_TARGET_PROJECT}.csproj" \
         -c "PaymentsContext" \
         --configuration Release
+
+RUN /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P super -d explorer-v1 -i /app/create_user_table.sql
+
+
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS final
+WORKDIR /app
+ENV ASPNETCORE_URLS=http://+:80
+
+COPY --from=publish /app/publish .
+
+CMD ["dotnet", "Explorer.API.dll"]
