@@ -48,7 +48,7 @@ func (userRepo *UserRepository) CloseDriverConnection(ctx context.Context) {
 
 func (userRepo *UserRepository) CreateUser(user *model.User) error {
 	ctx := context.Background()
-	session := userRepo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "users"})
+	session := userRepo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
 
 	savedUser, err := session.ExecuteWrite(ctx,
@@ -74,7 +74,7 @@ func (userRepo *UserRepository) CreateUser(user *model.User) error {
 
 func (userRepo *UserRepository) GetAllUsers(limit int) (model.Users, error) {
 	ctx := context.Background()
-	session := userRepo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "users"})
+	session := userRepo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
 
 	usersResult, err := session.ExecuteRead(ctx,

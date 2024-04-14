@@ -12,7 +12,7 @@ services:
       - 8083:8083
     environment:
       - PORT=8083
-      - NEO4J_DB=bolt://neo4j:7689
+      - NEO4J_DB=bolt://neo4j:7687
       - NEO4J_USERNAME=neo4j
       - NEO4J_PASS=adminadmin
     depends_on:
@@ -24,8 +24,8 @@ services:
     image: neo4j
     restart: always
     ports:
-      - "7689:7689"
-      - "7475:7475"
+      - "7687:7687"
+      - "7474:7474"
       - "7473:7473"
     healthcheck:
       # test: [ "CMD-SHELL", "echo RETURN 1 | cypher-shell -a <NEO4J_dbms_connector_bolt_listen__address> -u <user defined username> -p <user defined password> || exit 1" ]
