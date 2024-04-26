@@ -2,10 +2,11 @@ package repo
 
 import (
 	"context"
-	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"log"
-	"main.go/model"
 	"os"
+
+	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
+	"main.go/model"
 )
 
 type UserRepository struct {
@@ -72,6 +73,44 @@ func (userRepo *UserRepository) CreateUser(user *model.User) error {
 	return nil
 }
 
+func (userRepo *UserRepository) FollowUser(userID, followedUserID string) error {
+	ctx := context.Background()
+	session := userRepo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	_, err := session.ExecuteWrite(ctx,
+		func(transaction neo4j.ManagedTransaction) (interface{}, error) {
+			_, err := transaction.Run(ctx,
+				"MATCH (follower:User {username: $userID}), (followed:User {username: $followedUserID}) MERGE (follower)-[:FOLLOWS]->(followed)",
+				map[string]interface{}{"userID": userID, "followedUserID": followedUserID})
+			return nil, err
+		})
+	if err != nil {
+		userRepo.logger.Println("Error following user: ", err)
+		return err
+	}
+	return nil
+}
+
+func (userRepo *UserRepository) UnfollowUser(userID, unfollowedUserID string) error {
+	ctx := context.Background()
+	session := userRepo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	_, err := session.ExecuteWrite(ctx,
+		func(transaction neo4j.ManagedTransaction) (interface{}, error) {
+			_, err := transaction.Run(ctx,
+				"MATCH (follower:User {username: $userID})-[rel:FOLLOWS]->(unfollowed:User {username: $unfollowedUserID}) DELETE rel",
+				map[string]interface{}{"userID": userID, "unfollowedUserID": unfollowedUserID})
+			return nil, err
+		})
+	if err != nil {
+		userRepo.logger.Println("Error unfollowing user: ", err)
+		return err
+	}
+	return nil
+}
+
 func (userRepo *UserRepository) GetAllUsers(limit int) (model.Users, error) {
 	ctx := context.Background()
 	session := userRepo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
@@ -107,4 +146,42 @@ func (userRepo *UserRepository) GetAllUsers(limit int) (model.Users, error) {
 		return nil, err
 	}
 	return usersResult.(model.Users), nil
+}
+
+func (userRepo *UserRepository) GetRecommendedUsers(userID string) (model.Users, error) {
+	ctx := context.Background()
+	session := userRepo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	recommendedUsersResult, err := session.ExecuteRead(ctx,
+		func(transaction neo4j.ManagedTransaction) (any, error) {
+			result, err := transaction.Run(ctx,
+				`MATCH (user:User {username: $userID})-[:FOLLOWS]->(followedUser)-[:FOLLOWS]->(recommendedUser:User)
+					WHERE NOT (user)-[:FOLLOWS]->(recommendedUser)
+					RETURN recommendedUser.username, recommendedUser.role, recommendedUser.email`, map[string]interface{}{"userID": userID})
+			if err != nil {
+				return nil, err
+			}
+			var recommendedUsers model.Users
+			for result.Next(ctx) {
+				record := result.Record()
+				username, ok := record.Get("recommendedUser.username")
+				if !ok || username == nil {
+					username = "0"
+				}
+				role, _ := record.Get("recommendedUser.role")
+				email, _ := record.Get("recommendedUser.email")
+				recommendedUsers = append(recommendedUsers, &model.User{
+					Username: username.(string),
+					Role:     role.(model.UserRole),
+					Email:    email.(string),
+				})
+			}
+			return recommendedUsers, nil
+		})
+	if err != nil {
+		userRepo.logger.Println("Error getting recommended users: ", err)
+		return nil, err
+	}
+	return recommendedUsersResult.(model.Users), nil
 }
