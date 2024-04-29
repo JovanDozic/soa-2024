@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io"
 
+	"errors"
+
 	"github.com/google/uuid"
 )
 
@@ -48,4 +50,17 @@ func (user *Users) ToJSON(writer io.Writer) error {
 func (user *Users) FromJSON(reader io.Reader) error {
 	decoder := json.NewDecoder(reader)
 	return decoder.Decode(user)
+}
+
+func ConvertToRole(num int) (UserRole, error) {
+	switch num {
+	case 1:
+		return Tourist, nil
+	case 2:
+		return Admin, nil
+	case 3:
+		return Author, nil
+	default:
+		return _UserRole, errors.New("Invalid role number")
+	}
 }

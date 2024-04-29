@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
+
 	"main.go/model"
 )
 
@@ -120,7 +121,7 @@ func (userRepo *UserRepository) GetAllUsers(limit int) (model.Users, error) {
 		func(transation neo4j.ManagedTransaction) (any, error) {
 			result, err := transation.Run(ctx,
 				`MATCH (u:User)
-			RETURN u.username, u.role, u.email`, nil)
+				RETURN u.username as username, u.role as role, u.email as email`, nil)
 			if err != nil {
 				return nil, err
 			}
@@ -131,11 +132,18 @@ func (userRepo *UserRepository) GetAllUsers(limit int) (model.Users, error) {
 				if !ok || username == nil {
 					username = "0"
 				}
-				role, _ := record.Get("role")
+				roleInt, ok := record.Get("role")
+				if !ok || roleInt == nil {
+					continue
+				}
+				role, err := model.ConvertToRole(int(roleInt.(int64)))
+				if err != nil {
+					return nil, err
+				}
 				email, _ := record.Get("email")
 				users = append(users, &model.User{
 					Username: username.(string),
-					Role:     role.(model.UserRole),
+					Role:     role,
 					Email:    email.(string),
 				})
 			}
