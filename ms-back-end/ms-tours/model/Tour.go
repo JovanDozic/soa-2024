@@ -27,27 +27,8 @@ const (
 	Bicycle
 )
 
-/*type Tour struct {
-	ID            int64           `json:"id"`
-	Name          string          `json:"name"`
-	Description   string          `json:"description"`
-	Difficult     int             `json:"difficult"`
-	Status        TourStatus      `json:"status"`
-	Price         float32         `json:"price"`
-	AuthorId      int             `json:"authorId"`
-	Length        float32         `json:"length"`
-	PublishTime   time.Time       `json:"publishTime"`
-	ArchiveTime   time.Time       `json:"archiveTime"`
-	Points        []*Point        `gorm:"many2many:tour_points"`
-	Tags          []*Tag          `json:"tags"`
-	TourReviews   []*TourReview   `json:"tourReviews"`
-	RequiredTimes []*RequiredTime `json:"requiredTimes"`
-	Problems      []*Problem      `json:"problems"`
-	MyOwn         bool            `json:"myOwn"`
-}*/
-
 type Tour struct {
-	ID            int64          `bson:"_id,omitempty" json:"id"`
+	ID            int64          `bson:"_id" json:"id"`
 	Name          string         `bson:"name,omitempty" json:"name"`
 	Description   string         `bson:"description,omitempty" json:"description"`
 	Difficult     int            `bson:"difficult,omitempty" json:"difficult"`
