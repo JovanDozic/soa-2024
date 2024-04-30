@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"strconv"
 	"time"
 
@@ -108,6 +109,8 @@ func (pr *TourRepository) Insert(tour *Tour) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	patientsCollection := pr.getCollection()
+	rand.Seed(time.Now().UnixNano())
+	tour.ID = rand.Int63()
 
 	result, err := patientsCollection.InsertOne(ctx, &tour)
 	if err != nil {

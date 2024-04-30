@@ -67,7 +67,7 @@ export class TourFormComponent implements OnChanges, OnInit {
   }
 
   save() {
-    this.tour.id=4;
+    //this.tour.id= 4;
     this.tour.length = 50
     this.tour.publishTime = new Date().toISOString();
     this.tour.arhiveTime =new Date().toISOString();
