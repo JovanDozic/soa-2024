@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option go_package = "proto";
+
+service AuthenticationService{
+  rpc Login(Request) returns(Response){}
+  rpc Register(RegisterRequest) returns(Response){}
+  rpc ActivateAccount(ActivationRequest) returns(ActivationResponse){}
+  rpc ForgotPassword(ForgottenRequest) returns(Response){}
+  rpc ChangePassword(ChangeRequest) returns(Response){}
+}
+
+message ChangeRequest{
+  string email = 1;
+  string password = 2;
+}
+
+message ForgottenRequest{
+  string email = 1;
+}
+
+message ActivationRequest{
+  int32 id = 1;
+}
+
+message ActivationResponse{
+  bool isActivated = 1;
+}
+
+message RegisterRequest{
+  string username = 1;
+  string password = 2;
+  string email = 3;
+  string name = 4;
+  string surname = 5;
+}
+
+message Request{
+  string username = 1;
+  string password = 2;
+}
+
+message Response{
+  bool isValid = 1;
+  string jwtToken = 2;
+}

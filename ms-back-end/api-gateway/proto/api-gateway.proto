@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+option go_package = "/proto";
+
+import "google/api/annotations.proto";
+
+service AuthenticationService{
+  rpc Login(Request) returns(Response){
+    option (google.api.http) = {
+      post: "/login"
+      body: "*"
+    };
+  };
+  rpc Register(RegisterRequest) returns(Response){
+    option(google.api.http)={
+      post: "/register"
+      body: "*"
+    };
+  }
+  rpc ActivateAccount(ActivationRequest) returns(ActivationResponse){
+    option(google.api.http) = {
+      post: "/activate"
+      body: "*"
+    };
+  }
+  rpc ForgotPassword(ForgottenRequest) returns(Response){
+    option(google.api.http) = {
+      post: "/forgotPassword"
+      body: "*"
+    };
+  }
+  rpc ChangePassword(ChangeRequest) returns(Response){
+    option(google.api.http) = {
+      post: "/changePassword"
+      body: "*"
+    };
+  }
+}
+
+message ChangeRequest{
+  string email = 1;
+  string password = 2;
+}
+
+message ForgottenRequest{
+  string email = 1;
+}
+
+message ActivationRequest{
+  int32 id = 1;
+}
+
+message ActivationResponse{
+  bool isActivated = 1;
+}
+
+message RegisterRequest{
+  string username = 1;
+  string password = 2;
+  string email = 3;
+  string name = 4;
+  string surname = 5;
+}
+
+message Request{
+  string username = 1;
+  string password = 2;
+}
+
+message Response{
+  bool isValid = 1;
+  string jwtToken = 2;
+}

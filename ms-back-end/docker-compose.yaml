@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+
+  stakeholder-service:
+    image: stakeholder-service
+    container_name: stakeholder-service
+    hostname: stakeholder-service
+    build:
+      context: ./ms-stakeholders/
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      stakeholder-SERVICE_ADDRESS: ${stakeholder-SERVICE_ADDRESS}
+    networks:
+      - network
+
+  api_gateway:
+    image: api_gateway
+    container_name: api_gateway
+    hostname: api_gateway
+    build:
+      context: ./api-gateway/
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      api-gateway_SERVICE_ADDRESS: api-gateway_service:8084
+      GATEWAY_ADDRESS: ${GATEWAY_ADDRESS}
+    depends_on:
+      - api-gateway_service
+    networks:
+      - network
+    ports:
+      - "8084:8084"
+
+networks:
+  network:
+    driver: bridge
