@@ -52,7 +52,7 @@ func (user *Users) FromJSON(reader io.Reader) error {
 	return decoder.Decode(user)
 }
 
-func ConvertToRole(num int) (UserRole, error) {
+func ConvertToRole(num any) (UserRole, error) {
 	switch num {
 	case 1:
 		return Tourist, nil
@@ -61,6 +61,6 @@ func ConvertToRole(num int) (UserRole, error) {
 	case 3:
 		return Author, nil
 	default:
-		return _UserRole, errors.New("Invalid role number")
+		return _UserRole, errors.New("invalid role number")
 	}
 }

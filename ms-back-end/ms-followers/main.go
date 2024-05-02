@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
-	"github.com/gorilla/mux"
 	"log"
-	"main.go/handler"
-	"main.go/repo"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/gorilla/mux"
+	"main.go/handler"
+	"main.go/repo"
 
 	gorillaHandlers "github.com/gorilla/handlers"
 )
@@ -43,6 +44,15 @@ func main() {
 	postUserNode := router.Methods(http.MethodPost).Subrouter()
 	postUserNode.HandleFunc("/user", userHandler.CreateUser)
 	postUserNode.Use(userHandler.MiddlewareUserDeserialization)
+
+	followUserRoute := router.Methods(http.MethodPost).Subrouter()
+	followUserRoute.HandleFunc("/follow", userHandler.FollowUser)
+
+	unfollowUserRoute := router.Methods(http.MethodDelete).Subrouter()
+	unfollowUserRoute.HandleFunc("/unfollow", userHandler.UnfollowUser)
+
+	getRecommendedUsersRoute := router.Methods(http.MethodGet).Subrouter()
+	getRecommendedUsersRoute.HandleFunc("/recommended/{userID}", userHandler.GetRecommendedUsers)
 
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}))
 
