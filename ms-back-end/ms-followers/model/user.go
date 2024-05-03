@@ -52,7 +52,7 @@ func (user *Users) FromJSON(reader io.Reader) error {
 	return decoder.Decode(user)
 }
 
-func ConvertToRole(num any) (UserRole, error) {
+func ConvertToRole(num int64) (UserRole, error) {
 	switch num {
 	case 1:
 		return Tourist, nil
