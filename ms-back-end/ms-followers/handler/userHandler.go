@@ -2,12 +2,14 @@ package handler
 
 import (
 	"context"
-	"github.com/gorilla/mux"
+	"encoding/json"
 	"log"
-	"main.go/model"
-	"main.go/repo"
 	"net/http"
 	"strconv"
+
+	"github.com/gorilla/mux"
+	"main.go/model"
+	"main.go/repo"
 )
 
 type KeyProduct struct{}
@@ -80,4 +82,67 @@ func (handler *UserHandler) MiddlewareContentTypeSet(next http.Handler) http.Han
 
 		next.ServeHTTP(rw, h)
 	})
+}
+
+func (handler *UserHandler) FollowUser(writer http.ResponseWriter, request *http.Request) {
+	var requestBody map[string]string
+	err := json.NewDecoder(request.Body).Decode(&requestBody)
+	if err != nil {
+		http.Error(writer, "Unable to decode json", http.StatusBadRequest)
+		handler.logger.Fatal(err)
+		return
+	}
+
+	userID := requestBody["userID"]
+	followedUserID := requestBody["followedUserID"]
+
+	// Log the userID
+	handler.logger.Printf("Prvi userID: %s", userID)
+	handler.logger.Printf("Drugi userID: %s", followedUserID)
+
+	err = handler.repo.FollowUser(userID, followedUserID)
+	if err != nil {
+		handler.logger.Print("Database exception: ", err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+}
+
+func (handler *UserHandler) UnfollowUser(writer http.ResponseWriter, request *http.Request) {
+	var requestBody map[string]string
+	err := json.NewDecoder(request.Body).Decode(&requestBody)
+	if err != nil {
+		http.Error(writer, "Unable to decode json", http.StatusBadRequest)
+		handler.logger.Fatal(err)
+		return
+	}
+
+	userID := requestBody["userID"]
+	unfollowedUserID := requestBody["unfollowedUserID"]
+
+	err = handler.repo.UnfollowUser(userID, unfollowedUserID)
+	if err != nil {
+		handler.logger.Print("Database exception: ", err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+}
+func (handler *UserHandler) GetRecommendedUsers(writer http.ResponseWriter, request *http.Request) {
+	vars := mux.Vars(request)
+	userID := vars["userID"]
+	recommendedUsers, err := handler.repo.GetRecommendedUsers(userID)
+	if err != nil {
+		handler.logger.Print("Database exception: ", err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	err = recommendedUsers.ToJSON(writer)
+	if err != nil {
+		http.Error(writer, "Unable to convert to json", http.StatusInternalServerError)
+		handler.logger.Fatal("Unable to convert to json :", err)
+		return
+	}
 }
