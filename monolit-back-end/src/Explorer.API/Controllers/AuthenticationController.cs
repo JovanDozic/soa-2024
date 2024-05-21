@@ -1,7 +1,13 @@
-﻿using Explorer.Stakeholders.API.Dtos;
+﻿using System.Text;
+using Explorer.BuildingBlocks.Core.UseCases;
+using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Public;
+using Explorer.Tours.API.Dtos.Tours;
+using Explorer.Tours.Core.Domain.Tours;
+using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Explorer.API.Controllers;
 
@@ -10,6 +16,8 @@ public class AuthenticationController : BaseApiController
 {
     private readonly IAuthenticationService _authenticationService;
     private readonly IEmailService _emailService;
+    private readonly string _msGatewayUrl = "http://localhost:8084";
+    static readonly HttpClient _client = new();
     public AuthenticationController(IAuthenticationService authenticationService, IEmailService emailService)
     {
         _authenticationService = authenticationService;
@@ -29,6 +37,40 @@ public class AuthenticationController : BaseApiController
     {
         var result = _authenticationService.Login(credentials);
         return CreateResponse(result);
+    }
+
+    /*[HttpPost("login")]
+    public async Task<ActionResult<AuthenticationTokensDto>> Login([FromBody] CredentialsDto credentials)
+    {
+        string uri = $"{_msGatewayUrl}/login";
+        string tourJson = JsonConvert.SerializeObject(credentials);
+        HttpContent httpContent = new StringContent(tourJson, Encoding.UTF8, "application/json");
+        using HttpResponseMessage response = await _client.PostAsync(uri, httpContent);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return StatusCode((int)response.StatusCode);
+        }
+
+        string content = await response.Content.ReadAsStringAsync();
+        return CreateResponse(content.ToResult());
+    }*/
+
+    [HttpPost]
+    public async Task<ActionResult<AuthenticationTokensDto>> Register([FromBody] AccountRegistrationDto account)
+    {
+        string uri = $"{_msGatewayUrl}/register";
+        string tourJson = JsonConvert.SerializeObject(account);
+        HttpContent httpContent = new StringContent(tourJson, Encoding.UTF8, "application/json");
+        using HttpResponseMessage response = await _client.PostAsync(uri, httpContent);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return StatusCode((int)response.StatusCode);
+        }
+
+        string content = await response.Content.ReadAsStringAsync();
+        return CreateResponse(content.ToResult());
     }
 
     [AllowAnonymous]
