@@ -1,4 +1,4 @@
 export interface AuthenticationResponse {
-    id: number;
+    isValid: boolean;
     accessToken: string;
   }

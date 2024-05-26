@@ -68,6 +68,6 @@ message Request{
 }
 
 message Response{
-  bool isValid = 1;
+  int64 id = 1;
   string jwtToken = 2;
 }

@@ -4,12 +4,10 @@ package handler
 import (
 	"context"
 	"errors"
-	"fmt"
-	"ms-stakeholders/model"
+	"log"
+	"ms-stakeholders/jwtGenerator"
 	auth "ms-stakeholders/proto"
 	repo "ms-stakeholders/repo"
-
-	"github.com/golang-jwt/jwt/v4"
 )
 
 type AuthenticationHandler struct {
@@ -48,11 +46,9 @@ func (h AuthenticationHandler) mustEmbedUnimplementedAuthenticationServiceServer
 
 func (h AuthenticationHandler) Login(ctx context.Context, request *auth.Request) (*auth.Response, error) {
 	user, err := h.Repo.FindByName(request.Username)
+	log.Printf("Username req:" + request.Username)
 	if request.Password == user.Password {
-		return &auth.Response{
-			IsValid:  true,
-			JwtToken: h.GenerateAccessToken(user),
-		}, nil
+		return jwtGenerator.GenerateAccessToken(&user)
 	} else if err != nil {
 		return nil, err
 	} else {
@@ -62,82 +58,10 @@ func (h AuthenticationHandler) Login(ctx context.Context, request *auth.Request)
 
 func (h AuthenticationHandler) Register(ctx context.Context, request *auth.RegisterRequest) (*auth.Response, error) {
 	err := h.Repo.CreateUser(request)
-	user := &model.User{
-		ID:       0,
-		Username: request.Username,
-		Password: request.Password,
-		Email:    request.Email,
-		Name:     request.Name,
-		Surname:  request.Surname,
-	}
+	newUser, _ := h.Repo.FindByName(request.Username)
 	if err != nil {
 		println("Error while creating a new user")
 		return nil, err
 	}
-	return &auth.Response{
-		IsValid:  true,
-		JwtToken: h.GenerateAccessToken(*user),
-	}, nil
-}
-
-/*func (h AuthenticationHandler) CreateToken(username string) (jwtToken string) {
-	var jwtKey = []byte("secret_key")
-
-	claims := jwt.MapClaims{
-		"exp":      time.Now().Add(time.Hour * 24).Unix(),
-		"jti":      uuid.New().String(),
-		"id":       2,
-		"username": "userrr",
-		"personId": 2,
-		"role":     "roleee",
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	tokenString, err := token.SignedString(jwtKey)
-
-	if err != nil {
-		fmt.Println("Greska pri potpisivanju tokena:", err)
-		return
-	}
-
-	return tokenString
-}*/
-
-var _key = "your_secret_key"
-var _issuer = "your_issuer"
-var _audience = "your_audience"
-
-func (h AuthenticationHandler) GenerateAccessToken(user model.User) string {
-	authenticationResponse := AuthenticationTokens{}
-
-	claims := jwt.MapClaims{
-		//"jti":      uuid.New().String(),
-		"id":       fmt.Sprintf("%d", 2),
-		"username": "userrr",
-		"personId": fmt.Sprintf("%d", 3),
-		//"role":     "tourist",
-		//"exp":      time.Now().Add(time.Minute * 60 * 24).Unix(),
-		//"iat":      time.Now().Unix(),
-	}
-
-	jwtToken := CreateToken(claims, 60*24)
-	authenticationResponse.Id = 2
-	//authenticationResponse.AccessToken = jwtToken
-
-	return jwtToken
-}
-
-func CreateToken(claims jwt.MapClaims, expirationTimeInMinutes float64) string {
-	jwtKey := []byte(_key)
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	tokenString, err := token.SignedString(jwtKey)
-	if err != nil {
-		fmt.Println("Greška pri potpisivanju tokena:", err)
-		return ""
-	}
-
-	return tokenString
+	return jwtGenerator.GenerateAccessToken(&newUser)
 }

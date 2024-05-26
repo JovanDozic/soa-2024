@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Explorer.Blog.Core.Domain;
 using Explorer.BuildingBlocks.Core.UseCases;
 using Explorer.Stakeholders.API.Dtos;
 using Explorer.Stakeholders.API.Public;
@@ -8,6 +9,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Explorer.API.Controllers;
 
@@ -16,7 +18,7 @@ public class AuthenticationController : BaseApiController
 {
     private readonly IAuthenticationService _authenticationService;
     private readonly IEmailService _emailService;
-    private readonly string _msGatewayUrl = "http://localhost:8084";
+    private readonly string _gatewayUrl = "http://localhost:8084";
     static readonly HttpClient _client = new();
     public AuthenticationController(IAuthenticationService authenticationService, IEmailService emailService)
     {
@@ -24,27 +26,31 @@ public class AuthenticationController : BaseApiController
         _emailService = emailService;
     }
 
-    [HttpPost]
+    /*[HttpPost]
     public ActionResult<AuthenticationTokensDto> RegisterTourist([FromBody] AccountRegistrationDto account)
     {
         var result = _authenticationService.RegisterTourist(account);
         _emailService.SendActivationEmail(account.Email, result.Value.AccessToken);
         return CreateResponse(result);
-    }
+    }*/
 
-    [HttpPost("login")]
+    /*[HttpPost("login")]
     public ActionResult<AuthenticationTokensDto> Login([FromBody] CredentialsDto credentials)
     {
         var result = _authenticationService.Login(credentials);
         return CreateResponse(result);
-    }
+    }*/
 
-    /*[HttpPost("login")]
+    [HttpPost("login")]
     public async Task<ActionResult<AuthenticationTokensDto>> Login([FromBody] CredentialsDto credentials)
     {
-        string uri = $"{_msGatewayUrl}/login";
-        string tourJson = JsonConvert.SerializeObject(credentials);
-        HttpContent httpContent = new StringContent(tourJson, Encoding.UTF8, "application/json");
+        string uri = $"{_gatewayUrl}/login";
+        var settings = new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        };
+        string userJson = JsonConvert.SerializeObject(credentials, settings);
+        HttpContent httpContent = new StringContent(userJson, Encoding.UTF8, "application/json");
         using HttpResponseMessage response = await _client.PostAsync(uri, httpContent);
 
         if (!response.IsSuccessStatusCode)
@@ -54,14 +60,18 @@ public class AuthenticationController : BaseApiController
 
         string content = await response.Content.ReadAsStringAsync();
         return CreateResponse(content.ToResult());
-    }*/
+    }
 
     [HttpPost]
     public async Task<ActionResult<AuthenticationTokensDto>> Register([FromBody] AccountRegistrationDto account)
     {
-        string uri = $"{_msGatewayUrl}/register";
-        string tourJson = JsonConvert.SerializeObject(account);
-        HttpContent httpContent = new StringContent(tourJson, Encoding.UTF8, "application/json");
+        string uri = $"{_gatewayUrl}/register";
+        var settings = new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        };
+        string userJson = JsonConvert.SerializeObject(account, settings);
+        HttpContent httpContent = new StringContent(userJson, Encoding.UTF8, "application/json");
         using HttpResponseMessage response = await _client.PostAsync(uri, httpContent);
 
         if (!response.IsSuccessStatusCode)

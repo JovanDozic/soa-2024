@@ -50,9 +50,40 @@ services:
     ports:
       - "8084:8084"
 
+  ms-monolith:
+    build:
+      dockerfile: Dockerfile
+      context: ../monolit-back-end
+    image: monolith-back-end:latest
+    container_name: ms-monolith-container
+    restart: always
+    networks:
+      - network
+    ports:
+      - "8082:8082"
+    depends_on:
+      - monolith-database
+
+  monolith-database:
+    image: postgres:13
+    restart: always
+    networks:
+      - network
+    environment:
+      POSTGRES_PASSWORD: super
+      POSTGRES_USER: postgres
+      POSTGRES_DB: Explorer-v1
+      PGSEARCHPATH: monolith
+    volumes:
+      - ms-monolith-database-data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+
 volumes:
   ms-stakeholders-database-data:
     name: ms-stakeholders-database-data
+  ms-monolith-database-data:
+    name: ms-monolith-database-data
 
 networks:
   network:

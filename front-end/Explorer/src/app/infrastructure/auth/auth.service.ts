@@ -12,6 +12,7 @@ import { Registration } from './model/registration.model';
 import { ShoppingCart } from 'src/app/feature-modules/marketplace/model/shopping-cart.model';
 import { Wallet } from 'src/app/feature-modules/marketplace/model/wallet.model';
 import { PasswordChange } from './model/password-change.model';
+import { AuthenticationData } from './model/authentication-data.model';
 
 @Injectable({
   providedIn: 'root'
@@ -23,23 +24,24 @@ export class AuthService {
     private tokenStorage: TokenStorage,
     private router: Router) { }
 
-  login(login: Login): Observable<AuthenticationResponse> {
+  login(login: Login): Observable<AuthenticationData> {
     return this.http
-      .post<AuthenticationResponse>(environment.apiHost + 'users/login', login)
+      .post<AuthenticationData>(environment.apiHost + 'users/login', login)
       .pipe(
         tap((authenticationResponse) => {
-          this.tokenStorage.saveAccessToken(authenticationResponse.accessToken);
+          console.log(authenticationResponse.jwtToken)
+          this.tokenStorage.saveAccessToken(authenticationResponse.jwtToken);
           this.setUser();
         })
       );
   }
 
-  register(registration: Registration): Observable<AuthenticationResponse> {
+  register(registration: Registration): Observable<AuthenticationData> {
     return this.http
-    .post<AuthenticationResponse>(environment.apiHost + 'users', registration)
+    .post<AuthenticationData>(environment.apiHost + 'users', registration)
     .pipe(
       tap((authenticationResponse) => {
-        this.tokenStorage.saveAccessToken(authenticationResponse.accessToken);
+        this.tokenStorage.saveAccessToken(authenticationResponse.jwtToken);
         //this.setUser();
       })
     );
@@ -90,10 +92,12 @@ export class AuthService {
     const user: User = {
       id: +jwtHelperService.decodeToken(accessToken).id,
       username: jwtHelperService.decodeToken(accessToken).username,
-      role: jwtHelperService.decodeToken(accessToken)[
+      /*role: jwtHelperService.decodeToken(accessToken)[
         'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
-      ],
+      ],*/
+      role: jwtHelperService.decodeToken(accessToken).role,
     };
+    console.log(this.user$)
     this.user$.next(user);
   }
 }

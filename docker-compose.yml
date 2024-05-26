@@ -115,10 +115,10 @@ services:
 
   # # # # [ms-stakeholders]
 
-  stakeholder-service:
-    image: stakeholder-service
-    container_name: stakeholder-service
-    hostname: stakeholder-service
+  stakeholders-service:
+    image: stakeholders-service
+    container_name: stakeholders-service
+    hostname: stakeholders-service
     build:
       context: ./ms-back-end/ms-stakeholders/
       dockerfile: Dockerfile
@@ -127,20 +127,37 @@ services:
       STAKEHOLDER_SERVICE_ADDRESS: 8084
     networks:
       - servers
+    depends_on:
+      - ms-stakeholders-database
 
-  api_gateway:
-    image: api_gateway
-    container_name: api_gateway
-    hostname: api_gateway
+  ms-stakeholders-database:
+    image: postgres:13
+    restart: always
+    networks:
+      - servers
+    environment:
+      POSTGRES_PASSWORD: super
+      POSTGRES_USER: postgres
+      POSTGRES_DB: ms-stakeholders
+      PGSEARCHPATH: stakeholders
+    volumes:
+      - ms-stakeholders-database-data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+
+  api_gateway1:
+    image: api_gateway1
+    container_name: api_gateway1
+    hostname: api_gateway1
     build:
       context: ./ms-back-end/api-gateway/
       dockerfile: Dockerfile
     restart: always
     environment:
-      STAKEHOLDER_SERVICE_ADDRESS: stakeholder-service:8084
+      STAKEHOLDER_SERVICE_ADDRESS: stakeholders-service:8084
       GATEWAY_ADDRESS: 8084
     depends_on:
-      - stakeholder-service
+      - stakeholders-service
     networks:
       - servers
     ports:
