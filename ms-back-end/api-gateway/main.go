@@ -14,15 +14,14 @@ import (
 
 	"api-gateway/config"
 	"api-gateway/proto"
-
 )
 
 func main() {
 	cfg := config.GetConfig()
-
+	log.Println("Server started")
 	conn, err := grpc.DialContext(
 		context.Background(),
-		cfg.ApiGatewayServiceAddress,
+		cfg.StakeholderServiceAddress,
 		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)

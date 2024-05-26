@@ -3,13 +3,13 @@ package config
 import "os"
 
 type Config struct {
-	Address                  string
-	ApiGatewayServiceAddress string
+	Address                   string
+	StakeholderServiceAddress string
 }
 
 func GetConfig() Config {
 	return Config{
-		ApiGatewayServiceAddress: os.Getenv("API_GATEWAY_SERVICE_ADDRESS"),
-		Address:                  os.Getenv("GATEWAY_ADDRESS"),
+		StakeholderServiceAddress: os.Getenv("STAKEHOLDER_SERVICE_ADDRESS"),
+		Address:                   os.Getenv("GATEWAY_ADDRESS"),
 	}
 }

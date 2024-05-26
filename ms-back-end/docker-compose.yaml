@@ -2,36 +2,88 @@ version: "3.8"
 
 services:
 
-  stakeholder-service:
-    image: stakeholder-service
-    container_name: stakeholder-service
-    hostname: stakeholder-service
+  stakeholders-service:
+    image: stakeholders-service
+    container_name: stakeholders-service
+    hostname: stakeholders-service
     build:
       context: ./ms-stakeholders/
       dockerfile: Dockerfile
     restart: always
     environment:
-      stakeholder-SERVICE_ADDRESS: ${stakeholder-SERVICE_ADDRESS}
+      STAKEHOLDER_SERVICE_ADDRESS: ${STAKEHOLDER_SERVICE_ADDRESS}
     networks:
       - network
+    depends_on:
+      - ms-stakeholders-database
 
-  api_gateway:
-    image: api_gateway
-    container_name: api_gateway
-    hostname: api_gateway
+  ms-stakeholders-database:
+    image: postgres:13
+    restart: always
+    networks:
+      - network
+    environment:
+      POSTGRES_PASSWORD: super
+      POSTGRES_USER: postgres
+      POSTGRES_DB: ms-stakeholders
+      PGSEARCHPATH: stakeholders
+    volumes:
+      - ms-stakeholders-database-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  api_gateway1:
+    image: api_gateway1
+    container_name: api_gateway1
+    hostname: api_gateway1
     build:
       context: ./api-gateway/
       dockerfile: Dockerfile
     restart: always
     environment:
-      api-gateway_SERVICE_ADDRESS: api-gateway_service:8084
+      STAKEHOLDER_SERVICE_ADDRESS: stakeholders-service:8084
       GATEWAY_ADDRESS: ${GATEWAY_ADDRESS}
     depends_on:
-      - api-gateway_service
+      - stakeholders-service
     networks:
       - network
     ports:
       - "8084:8084"
+
+  ms-monolith:
+    build:
+      dockerfile: Dockerfile
+      context: ../monolit-back-end
+    image: monolith-back-end:latest
+    container_name: ms-monolith-container
+    restart: always
+    networks:
+      - network
+    ports:
+      - "8082:8082"
+    depends_on:
+      - monolith-database
+
+  monolith-database:
+    image: postgres:13
+    restart: always
+    networks:
+      - network
+    environment:
+      POSTGRES_PASSWORD: super
+      POSTGRES_USER: postgres
+      POSTGRES_DB: Explorer-v1
+      PGSEARCHPATH: monolith
+    volumes:
+      - ms-monolith-database-data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+
+volumes:
+  ms-stakeholders-database-data:
+    name: ms-stakeholders-database-data
+  ms-monolith-database-data:
+    name: ms-monolith-database-data
 
 networks:
   network:

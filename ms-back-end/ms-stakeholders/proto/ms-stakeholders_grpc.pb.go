@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v5.27.0--rc1
-// source: api-gateway.proto
+// source: ms-stakeholders.proto
 
-package proto
+package auth
 
 import (
 	context "context"
@@ -253,5 +253,5 @@ var AuthenticationService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api-gateway.proto",
+	Metadata: "ms-stakeholders.proto",
 }

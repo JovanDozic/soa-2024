@@ -38,18 +38,18 @@ export class RegistrationComponent {
     if (this.registrationForm.valid) {
       this.authService.register(registration).subscribe({
         next: (response) => {
-          const shoppingCart: ShoppingCart = {
+          /*const shoppingCart: ShoppingCart = {
             id: 0,
-            idUser: response.id,
+            idUser: 2,
             items: [],
           }
           const wallet: Wallet = {
             id: 0,
-            userId: response.id,
+            userId: 2,
             coins: 0
           }
           this.authService.createShoppingCart(shoppingCart).subscribe({})
-          this.authService.createWallet(wallet).subscribe({})
+          this.authService.createWallet(wallet).subscribe({})*/
           this.router.navigate(['home']);
         },
       });
