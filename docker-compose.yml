@@ -190,8 +190,12 @@ services:
   # # # # # [monitoring]
   loki:
     image: grafana/loki:latest
+    hostname: loki
     networks:
       - monitoring
+      - servers
+    volumes:
+      - ./monitoring/loki-config.yaml:/etc/loki/loki.yaml
 
   grafana:
     image: grafana/grafana:latest
@@ -203,7 +207,7 @@ services:
       GF_LOG_FILTERS: rendering:debug
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./grafana:/etc/grafana/provisioning
+      - ./monitoring/grafana:/etc/grafana/provisioning
     networks:
       - monitoring
       - servers
@@ -216,13 +220,10 @@ services:
       - monitoring
 
   fluent-bit:
-    image: grafana/fluent-bit-plugin-loki:latest
-    environment:
-      - LOKI_URL=http://loki:3100/loki/api/v1/push
-      - LOG_PATH=/fluent-bit/logs
+    image: fluent/fluent-bit:latest
     volumes:
-      - ./fluent-bit/fluent-bit.config:/fluent-bit/etc/fluent-bit.config
-      - /var/log/myapp:/fluent-bit/logs
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./monitoring/fluent-bit/fluent-bit.config:/fluent-bit/etc/fluent-bit.conf
     ports:
       - "24224:24224"
       - "24224:24224/udp"
