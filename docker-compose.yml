@@ -1,9 +1,11 @@
 version: "3.9"
 
-services:
-  # # # # # [microservices]
+x-logging: &fluentd
+  driver: fluentd
+  options:
+    fluentd-address: ${FLUENT_BIT_ADDRESS}:24224
 
-  # # # # [ms-tours]
+services:
   ms-tours:
     build:
       dockerfile: Dockerfile
@@ -11,8 +13,10 @@ services:
     image: microservice-tours:improve7
     container_name: ms-tours-container
     restart: always
+    logging: *fluentd
     networks:
       - servers
+      - monitoring
     ports:
       - "8081:8081"
     depends_on:
@@ -28,12 +32,12 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: ms-tours
       PGSEARCHPATH: tours
+    logging: *fluentd
     volumes:
       - ms-tours-database-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
-  # # # # [ms-blogs]
   ms-blogs:
     build:
       dockerfile: Dockerfile
@@ -41,8 +45,10 @@ services:
     image: microservice-blogs:improve7
     container_name: ms-blogs-container
     restart: always
+    logging: *fluentd
     networks:
       - servers
+      - monitoring
     ports:
       - "8080:8080"
     depends_on:
@@ -58,12 +64,12 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: ms-blogs
       PGSEARCHPATH: blogs
+    logging: *fluentd
     volumes:
       - ms-blogs-database-data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
 
-  # # # # [ms-followers]
   ms-followers:
     build:
       dockerfile: Dockerfile
@@ -72,8 +78,10 @@ services:
     container_name: ms-followers-container
     hostname: "user-server"
     restart: always
+    logging: *fluentd
     networks:
       - servers
+      - monitoring
     ports:
       - "8083:8083"
     environment:
@@ -85,10 +93,10 @@ services:
       neo4j:
         condition: service_healthy
 
-  # NoSQL: Neo4J DB
   neo4j:
     image: neo4j
     restart: always
+    logging: *fluentd
     ports:
       - "7687:7687"
       - "7474:7474"
@@ -107,8 +115,6 @@ services:
     volumes:
       - neo4j_data:/data
 
-  # # # # [ms-stakeholders]
-
   stakeholders-service:
     image: stakeholders-service
     container_name: stakeholders-service
@@ -117,16 +123,19 @@ services:
       context: ./ms-back-end/ms-stakeholders/
       dockerfile: Dockerfile
     restart: always
+    logging: *fluentd
     environment:
       STAKEHOLDER_SERVICE_ADDRESS: 8084
     networks:
       - servers
+      - monitoring
     depends_on:
       - ms-stakeholders-database
 
   ms-stakeholders-database:
     image: postgres:13
     restart: always
+    logging: *fluentd
     networks:
       - servers
     environment:
@@ -143,6 +152,7 @@ services:
     image: api_gateway1
     container_name: api_gateway1
     hostname: api_gateway1
+    logging: *fluentd
     build:
       context: ./ms-back-end/api-gateway/
       dockerfile: Dockerfile
@@ -154,10 +164,10 @@ services:
       - stakeholders-service
     networks:
       - servers
+      - monitoring
     ports:
       - "8084:8084"
 
-  # # # # # [monolith]
   ms-monolith:
     build:
       dockerfile: Dockerfile
@@ -165,8 +175,10 @@ services:
     image: monolith-back-end:latest
     container_name: ms-monolith-container
     restart: always
+    logging: *fluentd
     networks:
       - servers
+      - monitoring
     ports:
       - "8082:8082"
     depends_on:
@@ -175,6 +187,7 @@ services:
   monolith-database:
     image: postgres:13
     restart: always
+    logging: *fluentd
     networks:
       - servers
     environment:
@@ -186,50 +199,6 @@ services:
       - ms-monolith-database-data:/var/lib/postgresql/data
     ports:
       - "5434:5432"
-
-  # # # # # [monitoring]
-  loki:
-    image: grafana/loki:latest
-    hostname: loki
-    networks:
-      - monitoring
-      - servers
-    volumes:
-      - ./monitoring/loki-config.yaml:/etc/loki/loki.yaml
-
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3001:3000"
-    environment:
-      GF_RENDERING_SERVER_URL: http://renderer:8081/render
-      GF_RENDERING_CALLBACK_URL: http://grafana:3000/
-      GF_LOG_FILTERS: rendering:debug
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana:/etc/grafana/provisioning
-    networks:
-      - monitoring
-      - servers
-
-  renderer:
-    image: grafana/grafana-image-renderer:latest
-    environment:
-      ENABLE_METRICS: "true"
-    networks:
-      - monitoring
-
-  fluent-bit:
-    image: fluent/fluent-bit:latest
-    volumes:
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - ./monitoring/fluent-bit/fluent-bit.config:/fluent-bit/etc/fluent-bit.conf
-    ports:
-      - "24224:24224"
-      - "24224:24224/udp"
-    networks:
-      - monitoring
-      - servers
 
 volumes:
   ms-tours-database-data:
@@ -250,4 +219,4 @@ networks:
     name: servers
     driver: bridge
   monitoring:
-    name: monitoring
+    external: true
